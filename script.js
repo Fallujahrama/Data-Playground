@@ -19,30 +19,28 @@ let currentData = [10, 12, 9, 15, 20, 18, 14];
  */
 window.onload = function() {
   // Tambahkan event listener untuk checkbox tampilkan langkah
-  document.getElementById("showSteps").addEventListener("change", function() {
-    // Ambil data yang sudah dihitung sebelumnya
-    if (currentData && currentData.length > 0) {
-      // Hitung ulang statistik dasar yang diperlukan untuk updateLangkahPerhitungan
-      let sum = currentData.reduce((a, b) => a + b, 0);
-      let mean = sum / currentData.length;
-      let sorted = [...currentData].sort((a, b) => a - b);
-      let median = (currentData.length % 2 === 1)
-        ? sorted[Math.floor(currentData.length/2)]
-        : (sorted[currentData.length/2 - 1] + sorted[currentData.length/2]) / 2;
-      let freq = {};
-      currentData.forEach(v => freq[v] = (freq[v] || 0) + 1);
-      let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b);
-      let variance = currentData.reduce((a,b) => a + Math.pow(b-mean,2),0) / currentData.length;
-      let std = Math.sqrt(variance);
-      
-      // Update tampilan langkah perhitungan tanpa menghitung ulang semua
-      updateLangkahPerhitungan(currentData, sum, mean, sorted, median, freq, mode, variance, std);
-    }
-  });
+  document.getElementById("showSteps").addEventListener("change", toggleLangkahPerhitungan);
   
   prosesData();
   initChart(currentData);
 };
+
+/**
+ * Fungsi untuk menampilkan atau menyembunyikan langkah perhitungan saat checkbox berubah
+ * Dijalankan langsung saat checkbox diklik
+ */
+function toggleLangkahPerhitungan() {
+  const showSteps = document.getElementById("showSteps").checked;
+  const output = document.getElementById("output");
+  
+  if (showSteps) {
+    // Jika checkbox dicentang, jalankan prosesData untuk menampilkan langkah perhitungan
+    prosesData();
+  } else {
+    // Jika checkbox tidak dicentang, kosongkan area output
+    output.innerHTML = "";
+  }
+}
 
 /**
  * Fungsi untuk memuat dataset contoh secara acak
@@ -372,21 +370,8 @@ function prosesData() {
   createHistogram(data);
 
   // ===== LANGKAH PERHITUNGAN =====
-  // Tambahkan fungsi untuk menampilkan/menyembunyikan langkah perhitungan
-  // tanpa menjalankan ulang seluruh perhitungan
-  updateLangkahPerhitungan(data, sum, mean, sorted, median, freq, mode, variance, std);
-}
-
-/**
- * Fungsi untuk memperbarui tampilan langkah perhitungan berdasarkan status checkbox
- * Dipanggil oleh prosesData dan juga oleh event listener checkbox
- */
-function updateLangkahPerhitungan(data, sum, mean, sorted, median, freq, mode, variance, std) {
   // Tampilkan langkah perhitungan jika checkbox dicentang
   if (document.getElementById("showSteps").checked) {
-    // Jika tidak ada data, jangan tampilkan apapun
-    if (!data || data.length === 0) return;
-    
     // Ambil konten output saat ini (peringatan jika ada)
     let currentOutput = document.getElementById("output").innerHTML;
     let html = currentOutput;
