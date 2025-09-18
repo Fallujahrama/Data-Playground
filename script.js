@@ -18,6 +18,9 @@ let currentData = [10, 12, 9, 15, 20, 18, 14];
  * Memproses data awal dan menginisialisasi chart
  */
 window.onload = function() {
+  // Tambahkan event listener untuk checkbox tampilkan langkah
+  document.getElementById("showSteps").addEventListener("change", prosesData);
+  
   prosesData();
   initChart(currentData);
 };
