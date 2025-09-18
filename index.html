@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Playground — Eksplorasi Interaktif Statistika</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Load JavaScript dari file eksternal -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Data Playground — Eksplorasi Interaktif Statistika</h1>
+    
+    <div class="grid">
+      <div class="card">
+        <h2 class="card-title">Input Data</h2>
+        <textarea id="inputData">10, 12, 9, 15, 20, 18, 14</textarea>
+        <div>
+          <button onclick="prosesData()">Terapkan Data</button>
+          <button class="secondary" onclick="loadContohData()">Contoh Dataset</button>
+          <button class="danger" onclick="clearData()">Kosongkan</button>
+        </div>
+        
+        <div class="checkbox-container">
+          <input type="checkbox" id="showSteps" checked>
+          <label for="showSteps">Tampilkan langkah perhitungan</label>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2 class="card-title">Preview Data & Statistik</h2>
+        <p id="dataCount" style="font-size: 14px; color: var(--text-light);">Data saat ini: 7 nilai</p>
+        
+        <div class="tabs">
+          <button class="tab-btn active" onclick="showTab('histogram')">Histogram</button>
+          <button class="tab-btn" onclick="showTab('table')">Tabel</button>
+        </div>
+        
+        <div id="histogram-tab" class="tab-content active">
+          <canvas id="histogramChart"></canvas>
+        </div>
+        
+        <div id="table-tab" class="tab-content">
+          <div id="tableOutput"></div>
+        </div>
+        
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">N</div>
+            <div class="stat-value" id="n-value">7</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Mean</div>
+            <div class="stat-value" id="mean-value">14.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Median</div>
+            <div class="stat-value" id="median-value">14</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Mode</div>
+            <div class="stat-value" id="mode-value">10</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Std Dev</div>
+            <div class="stat-value" id="std-value">3.74</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" id="output"></div>
+  </div>
+</body>
+</html>
