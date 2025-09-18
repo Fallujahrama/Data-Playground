@@ -1,0 +1,377 @@
+:root {
+  --primary: #1a73e8;
+  --primary-light: #e8f0fe;
+  --primary-dark: #0d47a1;
+  --secondary: #f1f3f4;
+  --text-dark: #202124;
+  --text-light: #5f6368;
+  --success: #34a853;
+  --danger: #ea4335;
+  --warning: #fbbc04;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  --border-radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  background-color: #f5f5f5;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--primary-dark);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: var(--text-dark);
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background-color 0.2s;
+  margin: 5px;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+}
+
+button.secondary {
+  background-color: var(--secondary);
+  color: var(--text-dark);
+}
+
+button.secondary:hover {
+  background-color: #ddd;
+}
+
+button.danger {
+  background-color: var(--danger);
+}
+
+.result {
+  margin-top: 15px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 500;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  padding: 15px;
+  border-radius: var(--border-radius);
+  background-color: var(--secondary);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Styling untuk langkah perhitungan */
+.langkah-section {
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  padding: 20px;
+}
+
+.langkah-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-dark);
+}
+
+.langkah-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.langkah-section p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.rumus-desc {
+  color: var(--text-light);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+/* Menambahkan garis pembatas antara bagian */
+.langkah-section h4:not(:first-of-type) {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+/* Menyoroti nilai penting */
+.langkah-section strong {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* Pesan peringatan */
+.alert-warning {
+  background-color: #fff3e0;
+  border-left: 4px solid var(--warning);
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  color: #945700;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.alert-success {
+  background-color: #e8f5e9;
+  border-left: 4px solid var(--success);
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  color: #1b5e20;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Styling untuk rumus notasi matematika */
+.formula {
+  background-color: #f8f9fa;
+  padding: 12px 15px;
+  border-radius: 5px;
+  border-left: 3px solid var(--primary);
+  margin: 15px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  overflow-x: auto;
+  line-height: 1.7;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.formula-title {
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  display: block;
+  font-size: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 5px;
+}
+
+.formula-steps {
+  margin-top: 12px;
+  color: var(--text-dark);
+  padding-top: 5px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.formula-result {
+  font-weight: bold;
+  color: var(--primary-dark);
+  margin-top: 10px;
+  display: block;
+}
+
+/* Styling untuk subscript dalam rumus */
+.formula sub {
+  font-size: 12px;
+  vertical-align: sub;
+  line-height: 0;
+  margin-left: 1px;
+  color: var(--primary);
+}
+
+/* Styling untuk simbol matematika */
+.formula .symbol {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Ukuran untuk formula yang terlalu panjang */
+@media (max-width: 768px) {
+  .formula {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+/* Styling untuk alert error */
+.alert-error {
+  background-color: #ffebee;
+  border-left: 4px solid var(--danger);
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  color: #b71c1c;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Styling untuk perbandingan data */
+.data-compare {
+  margin-top: 10px;
+  font-size: 13px;
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Styling untuk daftar peringatan */
+.alert-warning ul {
+  margin-top: 8px;
+  margin-left: 20px;
+  font-size: 13px;
+}
+
+/* Styling untuk tombol download */
+.actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  background-color: #34a853;
+  transition: background-color 0.2s;
+}
+
+.download-btn:hover {
+  background-color: #2d8846;
+}
+
+.icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Styling untuk checkbox */
+.checkbox-container {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 8px;
+}
