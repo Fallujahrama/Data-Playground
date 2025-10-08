@@ -14,21 +14,27 @@
   <div class="container">
     <h1>Data Playground — Eksplorasi Interaktif Statistika</h1>
     
-    <div class="grid">
-      <div class="card">
-        <h2 class="card-title">Input Data</h2>
-        <textarea id="inputData">10, 12, 9, 15, 20, 18, 14</textarea>
-        <div>
-          <button onclick="prosesData()">Terapkan Data</button>
-          <button class="secondary" onclick="loadContohData()">Contoh Dataset</button>
-          <button class="danger" onclick="clearData()">Kosongkan</button>
+    <div class="tabs main-tabs">
+      <button class="tab-btn main-tab-btn active" onclick="showMainTab('dataTunggal')">Data Tunggal</button>
+      <button class="tab-btn main-tab-btn" onclick="showMainTab('dataKelompok')">Data Kelompok</button>
+    </div>
+    
+    <div id="dataTunggal-tab" class="main-tab-content active">
+      <div class="grid">
+        <div class="card">
+          <h2 class="card-title">Input Data Tunggal</h2>
+          <textarea id="inputData">10, 12, 9, 15, 20, 18, 14</textarea>
+          <div>
+            <button onclick="prosesData()">Terapkan Data</button>
+            <button class="secondary" onclick="loadContohData()">Contoh Dataset</button>
+            <button class="danger" onclick="clearData()">Kosongkan</button>
+          </div>
+          
+          <div class="checkbox-container">
+            <input type="checkbox" id="showSteps" checked>
+            <label for="showSteps">Tampilkan langkah perhitungan</label>
+          </div>
         </div>
-        
-        <div class="checkbox-container">
-          <input type="checkbox" id="showSteps" checked>
-          <label for="showSteps">Tampilkan langkah perhitungan</label>
-        </div>
-      </div>
       
       <div class="card">
         <h2 class="card-title">Preview Data & Statistik</h2>
@@ -73,6 +79,70 @@
     </div>
     
     <div class="card" id="output"></div>
+    </div>
+    
+    <div id="dataKelompok-tab" class="main-tab-content">
+      <div class="grid">
+        <div class="card">
+          <h2 class="card-title">Input Data Kelompok</h2>
+          <p class="help-text">Masukkan data kelompok dengan format: interval bawah-interval atas:frekuensi. Contoh: 1-10:5, 11-20:8, 21-30:12</p>
+          <textarea id="inputDataKelompok">1-10:5, 11-20:8, 21-30:12</textarea>
+          <div>
+            <button onclick="prosesDataKelompok()">Terapkan Data</button>
+            <button class="secondary" onclick="loadContohDataKelompok()">Contoh Dataset</button>
+            <button class="danger" onclick="clearDataKelompok()">Kosongkan</button>
+          </div>
+          
+          <div class="checkbox-container">
+            <input type="checkbox" id="showStepsKelompok" checked>
+            <label for="showStepsKelompok">Tampilkan langkah perhitungan</label>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-title">Preview Data & Statistik Kelompok</h2>
+          <p id="dataCountKelompok" style="font-size: 14px; color: var(--text-light);">Data saat ini: 3 kelompok, 25 nilai</p>
+          
+          <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('histogramKelompok')">Histogram</button>
+            <button class="tab-btn" onclick="showTab('tableKelompok')">Tabel</button>
+          </div>
+          
+          <div id="histogramKelompok-tab" class="tab-content active">
+            <canvas id="histogramChartKelompok"></canvas>
+          </div>
+          
+          <div id="tableKelompok-tab" class="tab-content">
+            <div id="tableOutputKelompok"></div>
+          </div>
+          
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">N</div>
+              <div class="stat-value" id="n-value-kelompok">25</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Mean</div>
+              <div class="stat-value" id="mean-value-kelompok">27.40</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Median</div>
+              <div class="stat-value" id="median-value-kelompok">28</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Mode</div>
+              <div class="stat-value" id="mode-value-kelompok">35</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Std Dev</div>
+              <div class="stat-value" id="std-value-kelompok">8.20</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="card" id="outputKelompok"></div>
+    </div>
   </div>
 </body>
 </html>

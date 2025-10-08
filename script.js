@@ -7,9 +7,17 @@
 
 // Variabel untuk menyimpan chart histogram yang akan diperbarui
 let histogramChart;
+let histogramChartKelompok;
 
 // Data awal yang ditampilkan saat aplikasi pertama kali dijalankan
 let currentData = [10, 12, 9, 15, 20, 18, 14];
+
+// Data awal untuk data kelompok (format: [[batas_bawah, batas_atas, frekuensi], ...])
+let currentDataKelompok = [
+  [1, 10, 5],
+  [11, 20, 8],
+  [21, 30, 12]
+];
 
 // ===== INISIALISASI APLIKASI =====
 
@@ -20,10 +28,41 @@ let currentData = [10, 12, 9, 15, 20, 18, 14];
 window.onload = function() {
   // Tambahkan event listener untuk checkbox tampilkan langkah
   document.getElementById("showSteps").addEventListener("change", toggleLangkahPerhitungan);
+  document.getElementById("showStepsKelompok").addEventListener("change", toggleLangkahPerhitunganKelompok);
   
   prosesData();
   initChart(currentData);
+  
+  // Initialize data kelompok juga
+  prosesDataKelompok();
+  initChartKelompok(currentDataKelompok);
 };
+
+/**
+ * Fungsi untuk beralih antar tab utama (data tunggal atau data kelompok)
+ * @param {string} tabName - Nama tab yang akan ditampilkan ("dataTunggal" atau "dataKelompok")
+ */
+function showMainTab(tabName) {
+  // Sembunyikan semua tab content
+  document.querySelectorAll('.main-tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Nonaktifkan semua tombol tab
+  document.querySelectorAll('.main-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Tampilkan tab yang dipilih
+  document.getElementById(tabName + '-tab').classList.add('active');
+  
+  // Aktifkan tombol yang diklik (cari berdasarkan onclick attribute)
+  document.querySelectorAll('.main-tab-btn').forEach(btn => {
+    if (btn.getAttribute('onclick').includes(tabName)) {
+      btn.classList.add('active');
+    }
+  });
+}
 
 /**
  * Fungsi untuk menampilkan atau menyembunyikan langkah perhitungan saat checkbox berubah
@@ -518,4 +557,528 @@ function prosesData() {
     // Jika langkah perhitungan tidak dicentang, kosongkan area output
     document.getElementById("output").innerHTML = "";
   }
+}
+
+/**
+ * Fungsi untuk menampilkan atau menyembunyikan langkah perhitungan saat checkbox berubah (untuk data kelompok)
+ */
+function toggleLangkahPerhitunganKelompok() {
+  const showSteps = document.getElementById("showStepsKelompok").checked;
+  const output = document.getElementById("outputKelompok");
+  
+  if (showSteps) {
+    // Jika checkbox dicentang, jalankan prosesDataKelompok untuk menampilkan langkah perhitungan
+    prosesDataKelompok();
+  } else {
+    // Jika checkbox tidak dicentang, kosongkan area output
+    output.innerHTML = "";
+  }
+}
+
+/**
+ * Fungsi untuk memuat dataset contoh untuk data kelompok
+ */
+function loadContohDataKelompok() {
+  // Dataset contoh yang bisa dipilih secara acak
+  let datasets = [
+    "1-10:5, 11-20:8, 21-30:12",
+    "50-59:10, 60-69:15, 70-79:20, 80-89:5",
+    "0-9:3, 10-19:7, 20-29:12, 30-39:8, 40-49:4",
+    "100-109:8, 110-119:15, 120-129:10, 130-139:5"
+  ];
+  
+  // Memilih dataset secara acak
+  let randomIndex = Math.floor(Math.random() * datasets.length);
+  document.getElementById("inputDataKelompok").value = datasets[randomIndex];
+  
+  // Proses dataset yang dipilih
+  prosesDataKelompok();
+}
+
+/**
+ * Fungsi untuk membersihkan semua data kelompok dan menghapus tampilan statistik
+ */
+function clearDataKelompok() {
+  // Kosongkan area input
+  document.getElementById("inputDataKelompok").value = "";
+  
+  // Kosongkan area output dan tabel
+  document.getElementById("outputKelompok").innerHTML = "";
+  document.getElementById("tableOutputKelompok").innerHTML = "";
+  
+  // Reset informasi jumlah data
+  document.getElementById("dataCountKelompok").textContent = "Data saat ini: 0 kelompok, 0 nilai";
+  
+  // Reset nilai statistik di kartu
+  document.getElementById("n-value-kelompok").textContent = "0";
+  document.getElementById("mean-value-kelompok").textContent = "0.00";
+  document.getElementById("median-value-kelompok").textContent = "0";
+  document.getElementById("mode-value-kelompok").textContent = "-";
+  document.getElementById("std-value-kelompok").textContent = "0.00";
+  
+  // Hapus chart jika ada
+  if (histogramChartKelompok) {
+    histogramChartKelompok.destroy();
+  }
+}
+
+/**
+ * Fungsi untuk membuat histogram dari data kelompok
+ * @param {Array} dataKelompok - Array berisi data kelompok dalam format [[batas_bawah, batas_atas, frekuensi], ...]
+ */
+function createHistogramKelompok(dataKelompok) {
+  // Hapus chart yang sudah ada jika ada
+  if (histogramChartKelompok) {
+    histogramChartKelompok.destroy();
+  }
+  
+  // Jika tidak ada data yang valid, keluar dari fungsi
+  if (dataKelompok.length === 0) {
+    return;
+  }
+  
+  // Buat label dan data untuk chart
+  let labels = dataKelompok.map(group => `${group[0]}-${group[1]}`);
+  let chartData = dataKelompok.map(group => group[2]);
+  
+  // Buat chart dengan Chart.js
+  let ctx = document.getElementById('histogramChartKelompok').getContext('2d');
+  histogramChartKelompok = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Frekuensi',
+        data: chartData,
+        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Frekuensi'
+          },
+          ticks: {
+            stepSize: 1
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Interval'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: false
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Fungsi untuk menginisialisasi chart untuk data kelompok
+ * @param {Array} dataKelompok - Array data kelompok yang akan digunakan
+ */
+function initChartKelompok(dataKelompok) {
+  createHistogramKelompok(dataKelompok);
+}
+
+/**
+ * Fungsi utama untuk memproses data kelompok dan menampilkan hasil statistik
+ */
+function prosesDataKelompok() {
+  let input = document.getElementById("inputDataKelompok").value;
+  
+  // Reset output area untuk menghapus langkah perhitungan sebelumnya
+  document.getElementById("outputKelompok").innerHTML = "";
+  
+  // Tampilkan pesan jika input kosong
+  if (!input.trim()) {
+    document.getElementById("outputKelompok").innerHTML = "<b>Data kosong! Silakan masukkan data kelompok dengan format: interval bawah-interval atas:frekuensi.</b>";
+    clearDataKelompok();
+    return;
+  }
+  
+  // Proses input data kelompok
+  try {
+    // Split input berdasarkan koma dan bersihkan whitespace
+    let kelompokItems = input.split(',').map(item => item.trim());
+    let dataKelompok = [];
+    let totalNilai = 0;
+    let lebarKelas = 0;
+    
+    // Parse setiap kelompok data
+    kelompokItems.forEach((item, index) => {
+      // Format yang diharapkan: "10-20:5" (interval:frekuensi)
+      let parts = item.split(':');
+      if (parts.length !== 2) throw new Error("Format data kelompok tidak valid");
+      
+      let interval = parts[0].trim().split('-');
+      if (interval.length !== 2) throw new Error("Format interval tidak valid");
+      
+      let batasBawah = parseInt(interval[0].trim());
+      let batasAtas = parseInt(interval[1].trim());
+      let frekuensi = parseInt(parts[1].trim());
+      
+      if (isNaN(batasBawah) || isNaN(batasAtas) || isNaN(frekuensi)) {
+        throw new Error("Nilai interval atau frekuensi tidak valid");
+      }
+      
+      // Cek lebar kelas untuk konsistensi
+      let currentWidth = batasAtas - batasBawah + 1; // +1 karena interval inklusif
+      if (index === 0) {
+        lebarKelas = currentWidth;
+      } else if (currentWidth !== lebarKelas) {
+        throw new Error(`Lebar kelas tidak konsisten. Semua kelas harus memiliki lebar yang sama (${lebarKelas})`);
+      }
+      
+      dataKelompok.push([batasBawah, batasAtas, frekuensi]);
+      totalNilai += frekuensi;
+    });
+    
+    // Urutkan dataKelompok berdasarkan batas bawah
+    dataKelompok.sort((a, b) => a[0] - b[0]);
+    
+    // Update variabel global
+    currentDataKelompok = dataKelompok;
+    
+    // Update informasi jumlah data
+    document.getElementById("dataCountKelompok").textContent = `Data saat ini: ${dataKelompok.length} kelompok, ${totalNilai} nilai`;
+    
+    // Hitung statistik untuk data kelompok
+    let stats = hitungStatistikKelompok(dataKelompok);
+    
+    // Update statistik cards
+    document.getElementById("n-value-kelompok").textContent = stats.n;
+    document.getElementById("mean-value-kelompok").textContent = stats.mean.toFixed(2);
+    document.getElementById("median-value-kelompok").textContent = stats.median;
+    document.getElementById("mode-value-kelompok").textContent = stats.mode;
+    document.getElementById("std-value-kelompok").textContent = stats.std.toFixed(2);
+    
+    // Update table
+    let tableHtml = "<table><tr><th>Interval</th><th>Frekuensi</th><th>Nilai Tengah</th><th>f×x</th></tr>";
+    for (let i = 0; i < dataKelompok.length; i++) {
+      let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+      let frekuensi = dataKelompok[i][2];
+      let nilaiTengah = (dataKelompok[i][0] + dataKelompok[i][1]) / 2;
+      let fx = frekuensi * nilaiTengah;
+      
+      tableHtml += `<tr><td>${interval}</td><td>${frekuensi}</td><td>${nilaiTengah}</td><td>${fx}</td></tr>`;
+    }
+    tableHtml += "</table>";
+    document.getElementById("tableOutputKelompok").innerHTML = tableHtml;
+    
+    // Update histogram
+    createHistogramKelompok(dataKelompok);
+    
+    // Tampilkan langkah perhitungan jika checkbox dicentang
+    if (document.getElementById("showStepsKelompok").checked) {
+      tampilkanLangkahPerhitunganKelompok(dataKelompok, stats);
+    }
+    
+  } catch (error) {
+    document.getElementById("outputKelompok").innerHTML = `<b>Error: ${error.message}</b><br>Pastikan format data: "batas bawah-batas atas:frekuensi" dan dipisahkan koma.`;
+    clearDataKelompok();
+  }
+}
+
+/**
+ * Fungsi untuk menghitung statistik dari data kelompok
+ * @param {Array} dataKelompok - Array data kelompok dalam format [[batas_bawah, batas_atas, frekuensi], ...]
+ * @returns {Object} Object berisi nilai n, mean, median, mode, variance, dan std
+ */
+function hitungStatistikKelompok(dataKelompok) {
+  // Ekstrak nilai tengah dan frekuensi dari setiap kelompok
+  let nilaiTengah = dataKelompok.map(group => (group[0] + group[1]) / 2);
+  let frekuensi = dataKelompok.map(group => group[2]);
+  
+  // Hitung n (total nilai)
+  let n = frekuensi.reduce((sum, f) => sum + f, 0);
+  
+  // Hitung mean
+  let fx = nilaiTengah.map((x, i) => x * frekuensi[i]);
+  let sumFx = fx.reduce((sum, val) => sum + val, 0);
+  let mean = sumFx / n;
+  
+  // Hitung median
+  let medianPosition = n / 2;
+  let cumulativeFreq = 0;
+  let medianGroupIndex = 0;
+  let cumulativeFreqArray = [0]; // Mulai dengan 0 untuk mempermudah akses
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    cumulativeFreq += frekuensi[i];
+    cumulativeFreqArray.push(cumulativeFreq);
+    
+    if (cumulativeFreq >= medianPosition && medianGroupIndex === 0) {
+      medianGroupIndex = i;
+    }
+  }
+  
+  let medianGroup = dataKelompok[medianGroupIndex];
+  let lowerBound = medianGroup[0];
+  // Cek kesamaan lebar kelas
+  let width = medianGroup[1] - medianGroup[0] + 1; // Tambahkan 1 karena interval inklusif
+  let prevCumulativeFreq = cumulativeFreqArray[medianGroupIndex];
+  let medianFreq = frekuensi[medianGroupIndex];
+  
+  let median = lowerBound + ((n/2 - prevCumulativeFreq) / medianFreq) * width;
+  median = Math.round(median);
+  
+  // Hitung modus (kelompok dengan frekuensi tertinggi)
+  let maxFreq = Math.max(...frekuensi);
+  let modeGroupIndex = frekuensi.indexOf(maxFreq);
+  let modeGroup = dataKelompok[modeGroupIndex];
+  
+  let mode = (modeGroup[0] + modeGroup[1]) / 2;
+  mode = Math.round(mode);
+  
+  // Hitung variance dan standar deviasi
+  let fxMinusMeanSquared = nilaiTengah.map((x, i) => frekuensi[i] * Math.pow(x - mean, 2));
+  let sumFxMinusMeanSquared = fxMinusMeanSquared.reduce((sum, val) => sum + val, 0);
+  let variance = sumFxMinusMeanSquared / n;
+  let std = Math.sqrt(variance);
+  
+  return {
+    n: n,
+    mean: mean,
+    median: median,
+    mode: mode,
+    variance: variance,
+    std: std
+  };
+}
+
+/**
+ * Fungsi untuk menampilkan langkah perhitungan statistik data kelompok
+ * @param {Array} dataKelompok - Array data kelompok dalam format [[batas_bawah, batas_atas, frekuensi], ...]
+ * @param {Object} stats - Object berisi hasil perhitungan statistik
+ */
+function tampilkanLangkahPerhitunganKelompok(dataKelompok, stats) {
+  let html = "<div class='langkah-section'>";
+  html += "<h3>Langkah Perhitungan Data Kelompok (Ringkasan)</h3>";
+  
+  // Siapkan data untuk perhitungan
+  let nilaiTengah = dataKelompok.map(group => (group[0] + group[1]) / 2);
+  let frekuensi = dataKelompok.map(group => group[2]);
+  let fx = nilaiTengah.map((x, i) => x * frekuensi[i]);
+  let sumFx = fx.reduce((sum, val) => sum + val, 0);
+  let n = frekuensi.reduce((sum, f) => sum + f, 0);
+  
+  // MEAN
+  html += "<h4>Mean</h4>";
+  html += "<p class='rumus-desc'>Jumlah (frekuensi × nilai tengah) dibagi total frekuensi</p>";
+  
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Mean untuk Data Kelompok:</span>";
+  html += "μ = Σ(f × x) / n";
+  
+  html += "<div class='formula-steps'>";
+  html += "μ = (";
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    if (i > 0) html += " + ";
+    html += `${frekuensi[i]} × ${nilaiTengah[i].toFixed(1)}`;
+  }
+  
+  html += ") / " + n;
+  html += `<br>μ = ${sumFx.toFixed(2)} / ${n}`;
+  html += `<br>μ = ${stats.mean.toFixed(2)}`;
+  html += "</div></div>";
+  
+  // Tabel perhitungan
+  html += "<table>";
+  html += "<tr><th>Interval</th><th>Frek (f)</th><th>Nilai Tengah (x)</th><th>f×x</th></tr>";
+  
+  let totalF = 0;
+  let totalFx = 0;
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let f = frekuensi[i];
+    let x = nilaiTengah[i];
+    let fxi = fx[i];
+    
+    html += `<tr><td>${interval}</td><td>${f}</td><td>${x.toFixed(1)}</td><td>${fxi.toFixed(2)}</td></tr>`;
+    
+    totalF += f;
+    totalFx += fxi;
+  }
+  
+  html += `<tr><td colspan="2">Total</td><td>Σf = ${totalF}</td><td>Σ(f×x) = ${totalFx.toFixed(2)}</td></tr>`;
+  html += "</table>";
+  
+  html += `<p><strong>Mean:</strong> Σ(f×x) / Σf = ${totalFx.toFixed(2)} / ${totalF} = ${stats.mean.toFixed(2)}</p>`;
+  
+  // MEDIAN
+  html += "<h4>Median</h4>";
+  html += "<p class='rumus-desc'>Nilai tengah dari data kelompok</p>";
+  
+  // Tentukan kelompok yang berisi median
+  let cumulativeFreq = 0;
+  let medianGroupIndex = 0;
+  let cumulativeFreqArray = [0]; // Mulai dengan 0 untuk mempermudah akses
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    cumulativeFreq += frekuensi[i];
+    cumulativeFreqArray.push(cumulativeFreq);
+    
+    if (cumulativeFreq >= n/2 && medianGroupIndex === 0) {
+      medianGroupIndex = i;
+    }
+  }
+  
+  let medianGroup = dataKelompok[medianGroupIndex];
+  let lowerBound = medianGroup[0];
+  let width = medianGroup[1] - medianGroup[0] + 1; // Tambahkan 1 karena interval inklusif
+  let prevCumulativeFreq = cumulativeFreqArray[medianGroupIndex];
+  let medianFreq = frekuensi[medianGroupIndex];
+  
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Median untuk Data Kelompok:</span>";
+  html += "Me = L + ((n/2 - CF) / f) × w";
+  html += "<p>Dimana: L = batas bawah kelas median, CF = frekuensi kumulatif sebelum kelas median, f = frekuensi kelas median, w = lebar kelas</p>";
+  
+  html += "<div class='formula-steps'>";
+  html += `Me = ${lowerBound} + ((${n}/2 - ${prevCumulativeFreq}) / ${medianFreq}) × ${width}`;
+  html += `<br>Me = ${lowerBound} + ((${n/2} - ${prevCumulativeFreq}) / ${medianFreq}) × ${width}`;
+  let calculation = lowerBound + ((n/2 - prevCumulativeFreq) / medianFreq) * width;
+  html += `<br>Me = ${calculation.toFixed(2)} ≈ ${stats.median}`;
+  html += "</div></div>";
+  
+  // Tabel frekuensi kumulatif
+  html += "<table>";
+  html += "<tr><th>Interval</th><th>Frekuensi (f)</th><th>Frekuensi Kumulatif (CF)</th></tr>";
+  
+  let runningSum = 0;
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let f = frekuensi[i];
+    runningSum += f;
+    let cfText = runningSum;
+    if (i === medianGroupIndex) {
+      cfText = `<strong>${cfText}</strong>`;
+      interval = `<strong>${interval}</strong> (kelas median)`;
+    }
+    html += `<tr><td>${interval}</td><td>${f}</td><td>${cfText}</td></tr>`;
+  }
+  html += "</table>";
+  
+  html += `<p><strong>Median:</strong> ${stats.median}</p>`;
+  
+  // MODUS
+  html += "<h4>Modus</h4>";
+  html += "<p class='rumus-desc'>Nilai tengah dari kelompok dengan frekuensi tertinggi</p>";
+  
+  let maxFreq = Math.max(...frekuensi);
+  let modeGroupIndex = frekuensi.indexOf(maxFreq);
+  let modeGroup = dataKelompok[modeGroupIndex];
+  let modeLowerBound = modeGroup[0];
+  let modeUpperBound = modeGroup[1];
+  
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Modus untuk Data Kelompok:</span>";
+  html += "Mo = nilai tengah kelas dengan frekuensi tertinggi";
+  html += "<div class='formula-steps'>";
+  html += `Mo = (${modeLowerBound} + ${modeUpperBound}) / 2`;
+  html += `<br>Mo = ${(modeLowerBound + modeUpperBound) / 2} ≈ ${stats.mode}`;
+  html += "</div></div>";
+  
+  // Tabel frekuensi untuk modus
+  html += "<table>";
+  html += "<tr><th>Interval</th><th>Frekuensi</th></tr>";
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let f = frekuensi[i];
+    if (i === modeGroupIndex) {
+      interval = `<strong>${interval}</strong> (frekuensi tertinggi)`;
+      f = `<strong>${f}</strong>`;
+    }
+    html += `<tr><td>${interval}</td><td>${f}</td></tr>`;
+  }
+  html += "</table>";
+  
+  html += `<p><strong>Modus:</strong> ${stats.mode} (dari interval ${modeLowerBound}-${modeUpperBound})</p>`;
+  
+  // STANDAR DEVIASI
+  html += "<h4>Variance dan Standar Deviasi</h4>";
+  html += "<p class='rumus-desc'>Perhitungan menggunakan nilai tengah interval</p>";
+  
+  // Hitung data untuk standar deviasi
+  let fxMinusMeanSquared = nilaiTengah.map((x, i) => frekuensi[i] * Math.pow(x - stats.mean, 2));
+  let sumFxMinusMeanSquared = fxMinusMeanSquared.reduce((sum, val) => sum + val, 0);
+  
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Variance untuk Data Kelompok:</span>";
+  html += "σ² = Σ[f × (x - μ)²] / n";
+  
+  html += "<div class='formula-steps'>";
+  html += "σ² = (";
+  for (let i = 0; i < nilaiTengah.length; i++) {
+    if (i > 0) html += " + ";
+    html += `${frekuensi[i]} × (${nilaiTengah[i].toFixed(1)} - ${stats.mean.toFixed(2)})²`;
+  }
+  html += ") / " + n;
+  html += `<br>σ² = ${sumFxMinusMeanSquared.toFixed(2)} / ${n}`;
+  html += `<br>σ² = ${stats.variance.toFixed(2)}`;
+  html += "</div></div>";
+  
+  // Tabel perhitungan standar deviasi
+  html += "<table>";
+  html += "<tr><th>Interval</th><th>Frek (f)</th><th>Nilai Tengah (x)</th><th>x - μ</th><th>(x - μ)²</th><th>f × (x - μ)²</th></tr>";
+  
+  let totalFxMinusMeanSq = 0;
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let f = frekuensi[i];
+    let x = nilaiTengah[i];
+    let xMinusMean = x - stats.mean;
+    let xMinusMeanSq = Math.pow(xMinusMean, 2);
+    let fxMinusMeanSq = f * xMinusMeanSq;
+    
+    html += `<tr>
+      <td>${interval}</td>
+      <td>${f}</td>
+      <td>${x.toFixed(1)}</td>
+      <td>${xMinusMean.toFixed(2)}</td>
+      <td>${xMinusMeanSq.toFixed(2)}</td>
+      <td>${fxMinusMeanSq.toFixed(2)}</td>
+    </tr>`;
+    
+    totalFxMinusMeanSq += fxMinusMeanSq;
+  }
+  
+  html += `<tr><td colspan="5">Total</td><td>${totalFxMinusMeanSq.toFixed(2)}</td></tr>`;
+  html += "</table>";
+  
+  html += `<p><strong>Variance:</strong> ${stats.variance.toFixed(2)}</p>`;
+  
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Standar Deviasi (σ):</span>";
+  html += "σ = √σ² = √Variance";
+  html += "<div class='formula-steps'>";
+  html += `σ = √${stats.variance.toFixed(2)}`;
+  html += `<br>σ = ${stats.std.toFixed(2)}`;
+  html += "</div></div>";
+  
+  html += `<p><strong>Standar Deviasi:</strong> ${stats.std.toFixed(2)}</p>`;
+  
+  html += "</div>";
+  
+  document.getElementById("outputKelompok").innerHTML = html;
 }
