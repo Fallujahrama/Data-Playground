@@ -14,6 +14,21 @@
   <div class="container">
     <h1>Data Playground — Eksplorasi Interaktif Statistika</h1>
     
+    <!-- Bagian Identitas Mahasiswa -->
+    <div class="card identity-card">
+      <h2 class="card-title">Identitas Mahasiswa</h2>
+      <div class="identity-input">
+        <label for="studentId">Masukkan NIM/Nama Anda:</label>
+        <input type="text" id="studentId" placeholder="Contoh: 123456789 atau Nama Anda">
+        <button onclick="generateTask()">Generate Tugas</button>
+      </div>
+      <div id="taskInstruction" class="task-instruction" style="display: none;">
+        <h3>📋 Tugas Anda:</h3>
+        <p id="taskText"></p>
+        <p class="task-note">Silakan masukkan data sesuai instruksi di atas pada tab yang sesuai.</p>
+      </div>
+    </div>
+    
     <div class="tabs main-tabs">
       <button class="tab-btn main-tab-btn active" onclick="showMainTab('dataTunggal')">Data Tunggal</button>
       <button class="tab-btn main-tab-btn" onclick="showMainTab('dataKelompok')">Data Kelompok</button>
@@ -23,7 +38,7 @@
       <div class="grid">
         <div class="card">
           <h2 class="card-title">Input Data Tunggal</h2>
-          <textarea id="inputData">10, 12, 9, 15, 20, 18, 14</textarea>
+          <textarea id="inputData" placeholder="Masukkan data Anda di sini, dipisahkan dengan koma. Contoh: 10, 12, 9, 15, 20, 18, 14"></textarea>
           <div>
             <button onclick="prosesData()">Terapkan Data</button>
             <button class="secondary" onclick="loadContohData()">Contoh Dataset</button>
@@ -86,7 +101,7 @@
         <div class="card">
           <h2 class="card-title">Input Data Kelompok</h2>
           <p class="help-text">Masukkan data kelompok dengan format: interval bawah-interval atas:frekuensi. Contoh: 1-10:5, 11-20:8, 21-30:12</p>
-          <textarea id="inputDataKelompok">1-10:5, 11-20:8, 21-30:12</textarea>
+          <textarea id="inputDataKelompok" placeholder="Masukkan data kelompok di sini. Contoh: 1-10:5, 11-20:8, 21-30:12"></textarea>
           <div>
             <button onclick="prosesDataKelompok()">Terapkan Data</button>
             <button class="secondary" onclick="loadContohDataKelompok()">Contoh Dataset</button>

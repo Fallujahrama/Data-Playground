@@ -19,7 +19,93 @@ let currentDataKelompok = [
   [21, 30, 12]
 ];
 
+// ===== DATA TUGAS UNTUK SETIAP MAHASISWA =====
+
+// Daftar tugas untuk data tunggal
+const tugasDataTunggal = [
+  "Masukkan data tinggi badan (dalam cm) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data berat badan (dalam kg) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data usia (dalam tahun) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data nilai ujian matematika teman sekelas Anda (skala 0-100, minimal 10 data)",
+  "Masukkan data jumlah saudara kandung teman sekelas Anda (minimal 10 data)",
+  "Masukkan data lama waktu perjalanan ke kampus (dalam menit) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data pengeluaran harian (dalam ribuan rupiah) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data jumlah jam tidur per hari teman sekelas Anda (minimal 10 data)",
+  "Masukkan data jumlah buku yang dibaca per bulan oleh teman sekelas Anda (minimal 10 data)",
+  "Masukkan data waktu penggunaan gadget per hari (dalam jam) teman sekelas Anda (minimal 10 data)"
+];
+
+// Daftar tugas untuk data kelompok
+const tugasDataKelompok = [
+  "Masukkan data kelompok tinggi badan (dalam cm) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok berat badan (dalam kg) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok usia (dalam tahun) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok nilai ujian statistika teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok jumlah jam belajar per minggu teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok jarak rumah ke kampus (dalam km) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok pengeluaran bulanan (dalam ribuan rupiah) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok IPK teman sekelas Anda (skala 0.00-4.00, minimal 5 kelompok)",
+  "Masukkan data kelompok jumlah kehadiran kuliah per semester teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok waktu mengerjakan tugas (dalam jam) teman sekelas Anda (minimal 5 kelompok)"
+];
+
+// Variabel untuk menyimpan tugas yang di-generate
+let currentTask = null;
+
 // ===== INISIALISASI APLIKASI =====
+
+/**
+ * Fungsi sederhana untuk hash string menjadi angka
+ * Digunakan untuk menghasilkan tugas yang konsisten berdasarkan ID mahasiswa
+ */
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Fungsi untuk generate tugas berdasarkan ID mahasiswa
+ */
+function generateTask() {
+  const studentId = document.getElementById("studentId").value.trim();
+  
+  if (!studentId) {
+    alert("Silakan masukkan NIM/Nama Anda terlebih dahulu!");
+    return;
+  }
+  
+  // Hash ID mahasiswa untuk mendapatkan index yang konsisten
+  const hash = hashString(studentId.toLowerCase());
+  
+  // Pilih tugas berdasarkan hash (akan selalu sama untuk ID yang sama)
+  const indexTunggal = hash % tugasDataTunggal.length;
+  const indexKelompok = hash % tugasDataKelompok.length;
+  
+  // Simpan tugas yang di-generate
+  currentTask = {
+    studentId: studentId,
+    tugalTunggal: tugasDataTunggal[indexTunggal],
+    tugalKelompok: tugasDataKelompok[indexKelompok]
+  };
+  
+  // Tampilkan instruksi tugas
+  const taskText = `
+    <strong>Untuk ${studentId}:</strong><br><br>
+    <strong>Data Tunggal:</strong> ${currentTask.tugalTunggal}<br>
+    <strong>Data Kelompok:</strong> ${currentTask.tugalKelompok}
+  `;
+  
+  document.getElementById("taskText").innerHTML = taskText;
+  document.getElementById("taskInstruction").style.display = "block";
+  
+  // Scroll ke instruksi
+  document.getElementById("taskInstruction").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
 /**
  * Fungsi yang dijalankan saat halaman dimuat
