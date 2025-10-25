@@ -19,17 +19,18 @@ let currentDataKelompok = [
   [21, 30, 12]
 ];
 
-// ===== DATA TUGAS UNTUK SETIAP MAHASISWA =====
+// ===== DATA TUGAS UNTUK SETIAP SISWA =====
 
 // Daftar tugas untuk data tunggal
 const tugasDataTunggal = [
   "Masukkan data tinggi badan (dalam cm) teman sekelas Anda (minimal 10 data)",
   "Masukkan data berat badan (dalam kg) teman sekelas Anda (minimal 10 data)",
   "Masukkan data usia (dalam tahun) teman sekelas Anda (minimal 10 data)",
-  "Masukkan data nilai ujian matematika teman sekelas Anda (skala 0-100, minimal 10 data)",
+  "Masukkan data nilai ujian matematika teman sekelas Anda (minimal 10 data)",
+  "Masukkan data jumlah kehadiran sekolah dalam satu bulan teman sekelas Anda (minimal 10 data)",
   "Masukkan data jumlah saudara kandung teman sekelas Anda (minimal 10 data)",
-  "Masukkan data lama waktu perjalanan ke kampus (dalam menit) teman sekelas Anda (minimal 10 data)",
-  "Masukkan data pengeluaran harian (dalam ribuan rupiah) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data lama waktu perjalanan ke sekolah (dalam menit) teman sekelas Anda (minimal 10 data)",
+  "Masukkan data uang saku harian (dalam ribuan rupiah) teman sekelas Anda (minimal 10 data)",
   "Masukkan data jumlah jam tidur per hari teman sekelas Anda (minimal 10 data)",
   "Masukkan data jumlah buku yang dibaca per bulan oleh teman sekelas Anda (minimal 10 data)",
   "Masukkan data waktu penggunaan gadget per hari (dalam jam) teman sekelas Anda (minimal 10 data)"
@@ -42,11 +43,11 @@ const tugasDataKelompok = [
   "Masukkan data kelompok usia (dalam tahun) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok nilai ujian statistika teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok jumlah jam belajar per minggu teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok jarak rumah ke kampus (dalam km) teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok pengeluaran bulanan (dalam ribuan rupiah) teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok IPK teman sekelas Anda (skala 0.00-4.00, minimal 5 kelompok)",
-  "Masukkan data kelompok jumlah kehadiran kuliah per semester teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok waktu mengerjakan tugas (dalam jam) teman sekelas Anda (minimal 5 kelompok)"
+  "Masukkan data kelompok jarak rumah ke sekolah (dalam km) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok uang saku bulanan (dalam ribuan rupiah) teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok nilai rata-rata rapor teman sekelas Anda (skala 0-100, minimal 5 kelompok)",
+  "Masukkan data kelompok jumlah kehadiran sekolah per bulan teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok waktu mengerjakan PR (dalam jam) teman sekelas Anda (minimal 5 kelompok)"
 ];
 
 // Variabel untuk menyimpan tugas yang di-generate
@@ -56,7 +57,7 @@ let currentTask = null;
 
 /**
  * Fungsi sederhana untuk hash string menjadi angka
- * Digunakan untuk menghasilkan tugas yang konsisten berdasarkan ID mahasiswa
+ * Digunakan untuk menghasilkan tugas yang konsisten berdasarkan Nama/ID siswa
  */
 function hashString(str) {
   let hash = 0;
@@ -69,17 +70,17 @@ function hashString(str) {
 }
 
 /**
- * Fungsi untuk generate tugas berdasarkan ID mahasiswa
+ * Fungsi untuk generate tugas berdasarkan Nama/ID siswa
  */
 function generateTask() {
   const studentId = document.getElementById("studentId").value.trim();
   
   if (!studentId) {
-    alert("Silakan masukkan NIM/Nama Anda terlebih dahulu!");
+    alert("Silakan masukkan Nama/NISN Anda terlebih dahulu!");
     return;
   }
   
-  // Hash ID mahasiswa untuk mendapatkan index yang konsisten
+  // Hash Nama/NISN siswa untuk mendapatkan index yang konsisten
   const hash = hashString(studentId.toLowerCase());
   
   // Pilih tugas berdasarkan hash (akan selalu sama untuk ID yang sama)
@@ -116,12 +117,13 @@ window.onload = function() {
   document.getElementById("showSteps").addEventListener("change", toggleLangkahPerhitungan);
   document.getElementById("showStepsKelompok").addEventListener("change", toggleLangkahPerhitunganKelompok);
   
-  prosesData();
-  initChart(currentData);
+  // Jangan proses data awal karena textarea kosong
+  // prosesData();
+  // initChart(currentData);
   
-  // Initialize data kelompok juga
-  prosesDataKelompok();
-  initChartKelompok(currentDataKelompok);
+  // Jangan initialize data kelompok juga
+  // prosesDataKelompok();
+  // initChartKelompok(currentDataKelompok);
 };
 
 /**
@@ -174,18 +176,41 @@ function toggleLangkahPerhitungan() {
 function loadContohData() {
   // Dataset contoh yang bisa dipilih secara acak
   let datasets = [
-    "10, 12, 9, 15, 20, 18, 14",
-    "23, 45, 67, 89, 12, 34, 56, 78, 90",
-    "5, 10, 15, 20, 25, 30, 35, 40, 45, 50",
-    "72, 75, 71, 73, 74, 76, 74, 71, 72"
+    [
+      [10, 1], [12, 1], [9, 1], [15, 2], [20, 1], [18, 1], [14, 1]
+    ],
+    [
+      [23, 1], [45, 2], [67, 1], [89, 1], [12, 1], [34, 1], [56, 1], [78, 1], [90, 1]
+    ],
+    [
+      [5, 1], [10, 1], [15, 2], [20, 2], [25, 1], [30, 1], [35, 1], [40, 1], [45, 1], [50, 1]
+    ],
+    [
+      [72, 2], [75, 1], [71, 2], [73, 1], [74, 2], [76, 1]
+    ]
   ];
   
   // Memilih dataset secara acak
   let randomIndex = Math.floor(Math.random() * datasets.length);
-  document.getElementById("inputData").value = datasets[randomIndex];
+  let selectedDataset = datasets[randomIndex];
+  
+  // Kosongkan tabel terlebih dahulu
+  const tbody = document.getElementById("dataTunggalTableBody");
+  tbody.innerHTML = "";
+  
+  // Isi tabel dengan data contoh
+  selectedDataset.forEach(([nilai, jumlah]) => {
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+      <td><input type="number" class="nilai-input" value="${nilai}" step="any" /></td>
+      <td><input type="number" class="jumlah-input" value="${jumlah}" min="1" /></td>
+      <td><button class="delete-row-btn" onclick="deleteRowTunggal(this)">🗑️</button></td>
+    `;
+    tbody.appendChild(newRow);
+  });
   
   // Proses dataset yang dipilih
-  prosesData();
+  prosesDataFromTable();
 }
 
 /**
@@ -193,8 +218,15 @@ function loadContohData() {
  * Dijalankan saat user klik tombol "Kosongkan"
  */
 function clearData() {
-  // Kosongkan area input
-  document.getElementById("inputData").value = "";
+  // Kosongkan tabel - reset ke 1 baris kosong
+  const tbody = document.getElementById("dataTunggalTableBody");
+  tbody.innerHTML = `
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="15" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="3" min="1" /></td>
+      <td><button class="delete-row-btn" onclick="deleteRowTunggal(this)">🗑️</button></td>
+    </tr>
+  `;
   
   // Kosongkan area output dan tabel
   document.getElementById("output").innerHTML = "";
@@ -208,7 +240,6 @@ function clearData() {
   document.getElementById("mean-value").textContent = "0.00";
   document.getElementById("median-value").textContent = "0";
   document.getElementById("mode-value").textContent = "-";
-  document.getElementById("std-value").textContent = "0.00";
   
   // Hapus chart jika ada
   if (histogramChart) {
@@ -386,13 +417,181 @@ function clearStatistics() {
   document.getElementById("mean-value").textContent = "0.00";
   document.getElementById("median-value").textContent = "0";
   document.getElementById("mode-value").textContent = "-";
-  document.getElementById("std-value").textContent = "0.00";
   document.getElementById("tableOutput").innerHTML = "";
   
   // Reset chart
   if (histogramChart) {
     histogramChart.destroy();
   }
+}
+
+// ===== FUNGSI UNTUK TABEL INPUT DATA TUNGGAL =====
+
+/**
+ * Fungsi untuk menambah baris baru pada tabel input data tunggal
+ */
+function addRowTunggal() {
+  const tbody = document.getElementById("dataTunggalTableBody");
+  const newRow = document.createElement("tr");
+  
+  newRow.innerHTML = `
+    <td><input type="number" class="nilai-input" placeholder="20" step="any" /></td>
+    <td><input type="number" class="jumlah-input" placeholder="2" min="1" /></td>
+    <td><button class="delete-row-btn" onclick="deleteRowTunggal(this)">🗑️</button></td>
+  `;
+  
+  tbody.appendChild(newRow);
+}
+
+/**
+ * Fungsi untuk menghapus baris dari tabel input data tunggal
+ */
+function deleteRowTunggal(button) {
+  const tbody = document.getElementById("dataTunggalTableBody");
+  const rows = tbody.getElementsByTagName("tr");
+  
+  // Jangan izinkan menghapus jika hanya tersisa 1 baris
+  if (rows.length <= 1) {
+    alert("Minimal harus ada 1 baris data!");
+    return;
+  }
+  
+  const row = button.parentNode.parentNode;
+  row.remove();
+}
+
+/**
+ * Fungsi untuk memproses data dari tabel input data tunggal
+ */
+function prosesDataFromTable() {
+  console.log("prosesDataFromTable dipanggil");
+  const tbody = document.getElementById("dataTunggalTableBody");
+  
+  if (!tbody) {
+    console.error("Tabel tidak ditemukan!");
+    alert("Error: Tabel input tidak ditemukan!");
+    return;
+  }
+  
+  const rows = tbody.getElementsByTagName("tr");
+  console.log("Jumlah baris:", rows.length);
+  
+  // Reset output area
+  document.getElementById("output").innerHTML = "";
+  
+  let data = [];
+  let hasError = false;
+  
+  // Ambil data dari setiap baris tabel
+  for (let i = 0; i < rows.length; i++) {
+    const nilaiInput = rows[i].querySelector(".nilai-input");
+    const jumlahInput = rows[i].querySelector(".jumlah-input");
+    
+    if (!nilaiInput || !jumlahInput) {
+      console.error(`Baris ${i + 1}: Input tidak ditemukan`);
+      continue;
+    }
+    
+    const nilaiValue = nilaiInput.value.trim();
+    const jumlahValue = jumlahInput.value.trim();
+    
+    console.log(`Baris ${i + 1}: Nilai=${nilaiValue}, Jumlah=${jumlahValue}`);
+    
+    // Skip baris kosong
+    if (!nilaiValue && !jumlahValue) {
+      console.log(`Baris ${i + 1}: Kosong, di-skip`);
+      continue;
+    }
+    
+    // Validasi input
+    if (!nilaiValue || !jumlahValue) {
+      alert(`Baris ${i + 1}: Harap isi nilai dan jumlah!`);
+      hasError = true;
+      break;
+    }
+    
+    const nilai = parseFloat(nilaiValue);
+    const jumlah = parseInt(jumlahValue);
+    
+    if (isNaN(nilai) || isNaN(jumlah)) {
+      alert(`Baris ${i + 1}: Nilai harus berupa angka!`);
+      hasError = true;
+      break;
+    }
+    
+    if (jumlah < 1) {
+      alert(`Baris ${i + 1}: Jumlah harus minimal 1!`);
+      hasError = true;
+      break;
+    }
+    
+    // Tambahkan nilai sebanyak jumlah yang ditentukan
+    for (let j = 0; j < jumlah; j++) {
+      data.push(nilai);
+    }
+  }
+  
+  console.log("Data yang dikumpulkan:", data);
+  
+  if (hasError) {
+    clearStatistics();
+    return;
+  }
+  
+  if (data.length === 0) {
+    alert("Tidak ada data yang dimasukkan!");
+    clearStatistics();
+    return;
+  }
+  
+  // Urutkan data
+  let sorted = [...data].sort((a, b) => a - b);
+  
+  console.log("Data setelah diurutkan:", sorted);
+  
+  // Update variabel global
+  currentData = sorted;
+  
+  // Update informasi jumlah data
+  document.getElementById("dataCount").textContent = `Data saat ini: ${sorted.length} nilai`;
+  
+  // ===== PERHITUNGAN STATISTIK =====
+  
+  // Hitung mean (rata-rata)
+  let sum = sorted.reduce((a, b) => a + b, 0);
+  let mean = sum / sorted.length;
+  
+  // Hitung median (nilai tengah)
+  let median = (sorted.length % 2 === 1)
+    ? sorted[Math.floor(sorted.length/2)]  // Jika ganjil, ambil nilai tengah
+    : (sorted[sorted.length/2 - 1] + sorted[sorted.length/2]) / 2; // Jika genap, ambil rata-rata dua nilai tengah
+  
+  // Hitung modus (nilai yang paling sering muncul)
+  let freq = {};
+  sorted.forEach(v => freq[v] = (freq[v] || 0) + 1); // Hitung frekuensi masing-masing nilai
+  let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b); // Temukan nilai dengan frekuensi tertinggi
+  
+  // Update statistik cards
+  document.getElementById("n-value").textContent = sorted.length;
+  document.getElementById("mean-value").textContent = mean.toFixed(2);
+  document.getElementById("median-value").textContent = median;
+  document.getElementById("mode-value").textContent = mode;
+  
+  // Update tabel preview
+  let tableHtml = "<table><tr><th>No.</th><th>Data</th></tr>";
+  for (let i = 0; i < sorted.length; i++) {
+    tableHtml += `<tr><td>${i + 1}</td><td>${sorted[i]}</td></tr>`;
+  }
+  tableHtml += "</table>";
+  document.getElementById("tableOutput").innerHTML = tableHtml;
+  
+  // Tampilkan langkah perhitungan jika checkbox dicentang
+  if (document.getElementById("showSteps").checked) {
+    tampilkanLangkahPerhitungan(sorted, mean, median, mode);
+  }
+  
+  // Buat histogram
+  createHistogram(sorted);
 }
 
 /**
@@ -471,17 +670,12 @@ function prosesData() {
   let freq = {};
   data.forEach(v => freq[v] = (freq[v] || 0) + 1); // Hitung frekuensi masing-masing nilai
   let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b); // Temukan nilai dengan frekuensi tertinggi
-
-  // Hitung varians dan standar deviasi
-  let variance = data.reduce((a,b) => a + Math.pow(b-mean,2),0) / data.length;
-  let std = Math.sqrt(variance);
   
   // Update statistik cards
   document.getElementById("n-value").textContent = data.length;
   document.getElementById("mean-value").textContent = mean.toFixed(2);
   document.getElementById("median-value").textContent = median;
   document.getElementById("mode-value").textContent = mode;
-  document.getElementById("std-value").textContent = std.toFixed(2);
   
   // Update table
   let tableHtml = "<table><tr><th>No.</th><th>Data</th></tr>";
@@ -587,54 +781,6 @@ function prosesData() {
     html += "<p><strong>Frekuensi:</strong> " + frekuensiText + "</p>";
     html += "<p><strong>Modus:</strong> " + mode + " (muncul " + freq[mode] + " kali)</p>";
     
-    // VARIANCE
-    html += "<h4>Variance</h4>";
-    html += "<p class='rumus-desc'>Hitung selisih tiap nilai ke mean, kuadratkan setiap selisih, lalu rata-rata kuadrat selisih tersebut</p>";
-    
-    // Hitung selisih dan kuadrat selisih untuk ditampilkan
-    let selisihArr = data.map(val => (val - mean).toFixed(2));
-    let selisihSquaredArr = data.map(val => Math.pow(val - mean, 2).toFixed(2));
-    
-    // Rumus Variance dalam notasi matematika
-    html += "<div class='formula'>";
-    html += "<span class='formula-title'>Rumus Variance (σ²):</span>";
-    html += "σ² = Σ(x - μ)² / n";
-    
-    html += "<div class='formula-steps'>";
-    html += "σ² = [(";
-    
-    for (let i = 0; i < data.length; i++) {
-      if (i > 0) html += " + ";
-      html += "(" + data[i] + " - " + mean.toFixed(2) + ")²";
-    }
-    
-    html += ")] / " + data.length;
-    html += "<br>σ² = [" + selisihSquaredArr.join(" + ") + "] / " + data.length;
-    html += "<br>σ² = " + selisihSquaredArr.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2) + " / " + data.length;
-    html += "<br>σ² = " + variance.toFixed(2);
-    html += "</div>";
-    html += "</div>";
-    
-    html += "<p><strong>Selisih dari mean:</strong> " + selisihArr.join(", ") + "</p>";
-    html += "<p><strong>Kuadrat selisih:</strong> " + selisihSquaredArr.join(", ") + "</p>";
-    html += "<p><strong>Variance:</strong> " + variance.toFixed(2) + "</p>";
-    
-    // STANDAR DEVIASI
-    html += "<h4>Standar Deviasi</h4>";
-    html += "<p class='rumus-desc'>Akar kuadrat dari variance</p>";
-    
-    // Rumus Standar Deviasi dalam notasi matematika
-    html += "<div class='formula'>";
-    html += "<span class='formula-title'>Rumus Standar Deviasi (σ):</span>";
-    html += "σ = √σ² = √Variance";
-    html += "<div class='formula-steps'>";
-    html += "σ = √" + variance.toFixed(2);
-    html += "<br>σ = " + std.toFixed(2);
-    html += "</div>";
-    html += "</div>";
-    
-    html += "<p><strong>Standar Deviasi:</strong> √" + variance.toFixed(2) + " = " + std.toFixed(2) + "</p>";
-    
     html += "</div>";
     
     // Update tampilan output
@@ -643,6 +789,109 @@ function prosesData() {
     // Jika langkah perhitungan tidak dicentang, kosongkan area output
     document.getElementById("output").innerHTML = "";
   }
+}
+
+/**
+ * Fungsi untuk menampilkan langkah perhitungan data tunggal
+ */
+function tampilkanLangkahPerhitungan(data, mean, median, mode) {
+  // Hitung ulang beberapa nilai yang dibutuhkan
+  let sum = data.reduce((a, b) => a + b, 0);
+  let sorted = [...data].sort((a, b) => a - b);
+  
+  // Hitung frekuensi untuk modus
+  let freq = {};
+  data.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  
+  let html = "<div class='langkah-section'>";
+  html += "<h3>Langkah Perhitungan (Ringkasan)</h3>";
+  
+  // MEAN
+  html += "<h4>Mean</h4>";
+  html += "<p class='rumus-desc'>Jumlah semua nilai dibagi banyaknya data</p>";
+  
+  html += "<p><strong>Nilai:</strong> " + data.join(", ") + "</p>";
+  
+  // Rumus Mean dalam notasi matematika
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Mean (μ):</span>";
+  html += "μ = (x₁ + x₂ + ... + xₙ) / n";
+  html += "<div class='formula-steps'>";
+  html += "μ = (" + data.join(" + ") + ") / " + data.length;
+  html += "<br>μ = " + sum.toFixed(2) + " / " + data.length;
+  html += "<br>μ = " + mean.toFixed(2);
+  html += "</div>";
+  html += "</div>";
+  
+  html += "<p><strong>Jumlah (sum):</strong> " + sum.toFixed(2) + "</p>";
+  html += "<p><strong>Mean:</strong> " + mean.toFixed(2) + "</p>";
+  
+  // MEDIAN
+  html += "<h4>Median</h4>";
+  html += "<p class='rumus-desc'>Data diurutkan, lalu ambil tengah (atau rata-rata dua tengah)</p>";
+  
+  html += "<p><strong>Data terurut:</strong> " + sorted.join(", ") + "</p>";
+  
+  // Rumus Median dalam notasi matematika
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Rumus Median:</span>";
+  
+  if (data.length % 2 === 1) {
+    // Rumus untuk jumlah data ganjil
+    let midIndex = Math.floor(data.length/2);
+    html += "Untuk jumlah data ganjil: Median = x<sub>(n+1)/2</sub>";
+    html += "<div class='formula-steps'>";
+    html += "Median = x<sub>(" + data.length + "+1)/2</sub> = x<sub>" + (midIndex + 1) + "</sub> = " + median;
+    html += "</div>";
+    html += "<p><strong>Median:</strong> " + median + " (nilai ke-" + (midIndex + 1) + " dari " + data.length + " data)</p>";
+  } else {
+    // Rumus untuk jumlah data genap
+    let midIndex1 = data.length/2 - 1;
+    let midIndex2 = data.length/2;
+    html += "Untuk jumlah data genap: Median = (x<sub>n/2</sub> + x<sub>(n/2)+1</sub>) / 2";
+    html += "<div class='formula-steps'>";
+    html += "Median = (x<sub>" + (midIndex1 + 1) + "</sub> + x<sub>" + (midIndex2 + 1) + "</sub>) / 2";
+    html += "<br>Median = (" + sorted[midIndex1] + " + " + sorted[midIndex2] + ") / 2";
+    html += "<br>Median = " + median;
+    html += "</div>";
+    html += "<p><strong>Median:</strong> " + median + " (rata-rata dari nilai ke-" + (midIndex1 + 1) + 
+            " (" + sorted[midIndex1] + ") dan ke-" + (midIndex2 + 1) + 
+            " (" + sorted[midIndex2] + "))</p>";
+  }
+  html += "</div>";
+  
+  // MODUS
+  html += "<h4>Modus</h4>";
+  html += "<p class='rumus-desc'>Nilai yang paling sering muncul</p>";
+  
+  // Notasi matematika untuk modus
+  html += "<div class='formula'>";
+  html += "<span class='formula-title'>Definisi Modus:</span>";
+  html += "Modus = nilai x dengan frekuensi tertinggi";
+  
+  // Hitung frekuensi untuk ditampilkan
+  let frekuensiText = "";
+  let frekuensiCalc = "";
+  for (let key in freq) {
+    frekuensiText += key + " (muncul " + freq[key] + " kali), ";
+    frekuensiCalc += "f(" + key + ") = " + freq[key] + ", ";
+  }
+  frekuensiText = frekuensiText.slice(0, -2); // Hapus koma dan spasi terakhir
+  frekuensiCalc = frekuensiCalc.slice(0, -2); // Hapus koma dan spasi terakhir
+  
+  html += "<div class='formula-steps'>";
+  html += "Frekuensi tiap nilai:<br>" + frekuensiCalc;
+  html += "<br>Nilai dengan frekuensi tertinggi: " + mode + " (muncul " + freq[mode] + " kali)";
+  html += "</div>";
+  html += "</div>";
+  
+  html += "<p><strong>Frekuensi:</strong> " + frekuensiText + "</p>";
+  html += "<p><strong>Modus:</strong> " + mode + " (muncul " + freq[mode] + " kali)</p>";
+  
+  html += "</div>";
+  
+  // Update tampilan output
+  document.getElementById("output").innerHTML = html;
 }
 
 /**
@@ -667,26 +916,68 @@ function toggleLangkahPerhitunganKelompok() {
 function loadContohDataKelompok() {
   // Dataset contoh yang bisa dipilih secara acak
   let datasets = [
-    "1-10:5, 11-20:8, 21-30:12",
-    "50-59:10, 60-69:15, 70-79:20, 80-89:5",
-    "0-9:3, 10-19:7, 20-29:12, 30-39:8, 40-49:4",
-    "100-109:8, 110-119:15, 120-129:10, 130-139:5"
+    [
+      ["1-10", 5],
+      ["11-20", 8],
+      ["21-30", 12]
+    ],
+    [
+      ["50-59", 10],
+      ["60-69", 15],
+      ["70-79", 20],
+      ["80-89", 5]
+    ],
+    [
+      ["0-9", 3],
+      ["10-19", 7],
+      ["20-29", 12],
+      ["30-39", 8],
+      ["40-49", 4]
+    ],
+    [
+      ["100-109", 8],
+      ["110-119", 15],
+      ["120-129", 10],
+      ["130-139", 5]
+    ]
   ];
   
   // Memilih dataset secara acak
   let randomIndex = Math.floor(Math.random() * datasets.length);
-  document.getElementById("inputDataKelompok").value = datasets[randomIndex];
+  let selectedDataset = datasets[randomIndex];
+  
+  // Kosongkan tabel terlebih dahulu
+  const tbody = document.getElementById("dataKelompokTableBody");
+  tbody.innerHTML = "";
+  
+  // Isi tabel dengan data contoh
+  selectedDataset.forEach(([interval, frekuensi]) => {
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+      <td><input type="text" class="interval-input" value="${interval}" /></td>
+      <td><input type="number" class="frekuensi-input" value="${frekuensi}" min="1" /></td>
+      <td><button class="delete-row-btn" onclick="deleteRowKelompok(this)">🗑️</button></td>
+    `;
+    tbody.appendChild(newRow);
+  });
   
   // Proses dataset yang dipilih
-  prosesDataKelompok();
+  prosesDataKelompokFromTable();
 }
 
 /**
  * Fungsi untuk membersihkan semua data kelompok dan menghapus tampilan statistik
  */
 function clearDataKelompok() {
-  // Kosongkan area input
-  document.getElementById("inputDataKelompok").value = "";
+  // Kosongkan tabel - reset ke 1 baris kosong
+  const tbody = document.getElementById("dataKelompokTableBody");
+  tbody.innerHTML = `
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="1-10" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="5" min="1" /></td>
+      <td><button class="delete-row-btn" onclick="deleteRowKelompok(this)">🗑️</button></td>
+    </tr>
+  `;
   
   // Kosongkan area output dan tabel
   document.getElementById("outputKelompok").innerHTML = "";
@@ -700,7 +991,6 @@ function clearDataKelompok() {
   document.getElementById("mean-value-kelompok").textContent = "0.00";
   document.getElementById("median-value-kelompok").textContent = "0";
   document.getElementById("mode-value-kelompok").textContent = "-";
-  document.getElementById("std-value-kelompok").textContent = "0.00";
   
   // Hapus chart jika ada
   if (histogramChartKelompok) {
@@ -782,6 +1072,152 @@ function initChartKelompok(dataKelompok) {
   createHistogramKelompok(dataKelompok);
 }
 
+// ===== FUNGSI UNTUK TABEL INPUT DATA KELOMPOK =====
+
+/**
+ * Fungsi untuk menambah baris baru pada tabel input data kelompok
+ */
+function addRowKelompok() {
+  const tbody = document.getElementById("dataKelompokTableBody");
+  const newRow = document.createElement("tr");
+  
+  newRow.innerHTML = `
+    <td><input type="text" class="interval-input" placeholder="31-40" /></td>
+    <td><input type="number" class="frekuensi-input" placeholder="5" min="1" /></td>
+    <td><button class="delete-row-btn" onclick="deleteRowKelompok(this)">🗑️</button></td>
+  `;
+  
+  tbody.appendChild(newRow);
+}
+
+/**
+ * Fungsi untuk menghapus baris dari tabel input data kelompok
+ */
+function deleteRowKelompok(button) {
+  const tbody = document.getElementById("dataKelompokTableBody");
+  const rows = tbody.getElementsByTagName("tr");
+  
+  // Jangan izinkan menghapus jika hanya tersisa 1 baris
+  if (rows.length <= 1) {
+    alert("Minimal harus ada 1 baris data!");
+    return;
+  }
+  
+  const row = button.parentNode.parentNode;
+  row.remove();
+}
+
+/**
+ * Fungsi untuk memproses data dari tabel input
+ */
+function prosesDataKelompokFromTable() {
+  const tbody = document.getElementById("dataKelompokTableBody");
+  const rows = tbody.getElementsByTagName("tr");
+  
+  // Reset output area
+  document.getElementById("outputKelompok").innerHTML = "";
+  
+  let dataKelompok = [];
+  let totalNilai = 0;
+  let hasError = false;
+  
+  // Ambil data dari setiap baris tabel
+  for (let i = 0; i < rows.length; i++) {
+    const intervalInput = rows[i].querySelector(".interval-input");
+    const frekuensiInput = rows[i].querySelector(".frekuensi-input");
+    
+    const intervalValue = intervalInput.value.trim();
+    const frekuensiValue = frekuensiInput.value.trim();
+    
+    // Skip baris kosong
+    if (!intervalValue && !frekuensiValue) continue;
+    
+    // Validasi input
+    if (!intervalValue || !frekuensiValue) {
+      alert(`Baris ${i + 1}: Harap isi interval dan frekuensi!`);
+      hasError = true;
+      break;
+    }
+    
+    // Parse interval
+    const intervalParts = intervalValue.split('-');
+    if (intervalParts.length !== 2) {
+      alert(`Baris ${i + 1}: Format interval tidak valid! Gunakan format: 1-10`);
+      hasError = true;
+      break;
+    }
+    
+    const batasBawah = parseInt(intervalParts[0].trim());
+    const batasAtas = parseInt(intervalParts[1].trim());
+    const frekuensi = parseInt(frekuensiValue);
+    
+    if (isNaN(batasBawah) || isNaN(batasAtas) || isNaN(frekuensi)) {
+      alert(`Baris ${i + 1}: Nilai harus berupa angka!`);
+      hasError = true;
+      break;
+    }
+    
+    if (frekuensi < 1) {
+      alert(`Baris ${i + 1}: Frekuensi harus minimal 1!`);
+      hasError = true;
+      break;
+    }
+    
+    dataKelompok.push([batasBawah, batasAtas, frekuensi]);
+    totalNilai += frekuensi;
+  }
+  
+  if (hasError) {
+    clearDataKelompok();
+    return;
+  }
+  
+  if (dataKelompok.length === 0) {
+    alert("Tidak ada data yang dimasukkan!");
+    clearDataKelompok();
+    return;
+  }
+  
+  // Urutkan dataKelompok berdasarkan batas bawah
+  dataKelompok.sort((a, b) => a[0] - b[0]);
+  
+  // Update variabel global
+  currentDataKelompok = dataKelompok;
+  
+  // Update informasi jumlah data
+  document.getElementById("dataCountKelompok").textContent = `Data saat ini: ${dataKelompok.length} kelompok, ${totalNilai} nilai`;
+  
+  // Hitung statistik untuk data kelompok
+  let stats = hitungStatistikKelompok(dataKelompok);
+  
+  // Update statistik cards
+  document.getElementById("n-value-kelompok").textContent = stats.n;
+  document.getElementById("mean-value-kelompok").textContent = stats.mean.toFixed(2);
+  document.getElementById("median-value-kelompok").textContent = stats.median;
+  document.getElementById("mode-value-kelompok").textContent = stats.mode;
+  
+  // Update table
+  let tableHtml = "<table><tr><th>Interval</th><th>Frekuensi</th><th>Nilai Tengah</th><th>f×x</th></tr>";
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let frekuensi = dataKelompok[i][2];
+    let nilaiTengah = (dataKelompok[i][0] + dataKelompok[i][1]) / 2;
+    let fx = frekuensi * nilaiTengah;
+    
+    tableHtml += `<tr><td>${interval}</td><td>${frekuensi}</td><td>${nilaiTengah}</td><td>${fx}</td></tr>`;
+  }
+  tableHtml += "</table>";
+  document.getElementById("tableOutputKelompok").innerHTML = tableHtml;
+  
+  // Tampilkan langkah perhitungan jika checkbox dicentang
+  if (document.getElementById("showStepsKelompok").checked) {
+    tampilkanLangkahPerhitunganKelompok(dataKelompok, stats);
+  }
+  
+  // Buat histogram untuk data kelompok
+  createHistogramKelompok(dataKelompok);
+}
+
 /**
  * Fungsi utama untuk memproses data kelompok dan menampilkan hasil statistik
  */
@@ -852,7 +1288,6 @@ function prosesDataKelompok() {
     document.getElementById("mean-value-kelompok").textContent = stats.mean.toFixed(2);
     document.getElementById("median-value-kelompok").textContent = stats.median;
     document.getElementById("mode-value-kelompok").textContent = stats.mode;
-    document.getElementById("std-value-kelompok").textContent = stats.std.toFixed(2);
     
     // Update table
     let tableHtml = "<table><tr><th>Interval</th><th>Frekuensi</th><th>Nilai Tengah</th><th>f×x</th></tr>";
@@ -884,7 +1319,7 @@ function prosesDataKelompok() {
 /**
  * Fungsi untuk menghitung statistik dari data kelompok
  * @param {Array} dataKelompok - Array data kelompok dalam format [[batas_bawah, batas_atas, frekuensi], ...]
- * @returns {Object} Object berisi nilai n, mean, median, mode, variance, dan std
+ * @returns {Object} Object berisi nilai n, mean, median, dan mode
  */
 function hitungStatistikKelompok(dataKelompok) {
   // Ekstrak nilai tengah dan frekuensi dari setiap kelompok
@@ -932,19 +1367,11 @@ function hitungStatistikKelompok(dataKelompok) {
   let mode = (modeGroup[0] + modeGroup[1]) / 2;
   mode = Math.round(mode);
   
-  // Hitung variance dan standar deviasi
-  let fxMinusMeanSquared = nilaiTengah.map((x, i) => frekuensi[i] * Math.pow(x - mean, 2));
-  let sumFxMinusMeanSquared = fxMinusMeanSquared.reduce((sum, val) => sum + val, 0);
-  let variance = sumFxMinusMeanSquared / n;
-  let std = Math.sqrt(variance);
-  
   return {
     n: n,
     mean: mean,
     median: median,
-    mode: mode,
-    variance: variance,
-    std: std
+    mode: mode
   };
 }
 
@@ -1099,70 +1526,6 @@ function tampilkanLangkahPerhitunganKelompok(dataKelompok, stats) {
   html += "</table>";
   
   html += `<p><strong>Modus:</strong> ${stats.mode} (dari interval ${modeLowerBound}-${modeUpperBound})</p>`;
-  
-  // STANDAR DEVIASI
-  html += "<h4>Variance dan Standar Deviasi</h4>";
-  html += "<p class='rumus-desc'>Perhitungan menggunakan nilai tengah interval</p>";
-  
-  // Hitung data untuk standar deviasi
-  let fxMinusMeanSquared = nilaiTengah.map((x, i) => frekuensi[i] * Math.pow(x - stats.mean, 2));
-  let sumFxMinusMeanSquared = fxMinusMeanSquared.reduce((sum, val) => sum + val, 0);
-  
-  html += "<div class='formula'>";
-  html += "<span class='formula-title'>Rumus Variance untuk Data Kelompok:</span>";
-  html += "σ² = Σ[f × (x - μ)²] / n";
-  
-  html += "<div class='formula-steps'>";
-  html += "σ² = (";
-  for (let i = 0; i < nilaiTengah.length; i++) {
-    if (i > 0) html += " + ";
-    html += `${frekuensi[i]} × (${nilaiTengah[i].toFixed(1)} - ${stats.mean.toFixed(2)})²`;
-  }
-  html += ") / " + n;
-  html += `<br>σ² = ${sumFxMinusMeanSquared.toFixed(2)} / ${n}`;
-  html += `<br>σ² = ${stats.variance.toFixed(2)}`;
-  html += "</div></div>";
-  
-  // Tabel perhitungan standar deviasi
-  html += "<table>";
-  html += "<tr><th>Interval</th><th>Frek (f)</th><th>Nilai Tengah (x)</th><th>x - μ</th><th>(x - μ)²</th><th>f × (x - μ)²</th></tr>";
-  
-  let totalFxMinusMeanSq = 0;
-  
-  for (let i = 0; i < dataKelompok.length; i++) {
-    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
-    let f = frekuensi[i];
-    let x = nilaiTengah[i];
-    let xMinusMean = x - stats.mean;
-    let xMinusMeanSq = Math.pow(xMinusMean, 2);
-    let fxMinusMeanSq = f * xMinusMeanSq;
-    
-    html += `<tr>
-      <td>${interval}</td>
-      <td>${f}</td>
-      <td>${x.toFixed(1)}</td>
-      <td>${xMinusMean.toFixed(2)}</td>
-      <td>${xMinusMeanSq.toFixed(2)}</td>
-      <td>${fxMinusMeanSq.toFixed(2)}</td>
-    </tr>`;
-    
-    totalFxMinusMeanSq += fxMinusMeanSq;
-  }
-  
-  html += `<tr><td colspan="5">Total</td><td>${totalFxMinusMeanSq.toFixed(2)}</td></tr>`;
-  html += "</table>";
-  
-  html += `<p><strong>Variance:</strong> ${stats.variance.toFixed(2)}</p>`;
-  
-  html += "<div class='formula'>";
-  html += "<span class='formula-title'>Rumus Standar Deviasi (σ):</span>";
-  html += "σ = √σ² = √Variance";
-  html += "<div class='formula-steps'>";
-  html += `σ = √${stats.variance.toFixed(2)}`;
-  html += `<br>σ = ${stats.std.toFixed(2)}`;
-  html += "</div></div>";
-  
-  html += `<p><strong>Standar Deviasi:</strong> ${stats.std.toFixed(2)}</p>`;
   
   html += "</div>";
   

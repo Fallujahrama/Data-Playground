@@ -14,12 +14,12 @@
   <div class="container">
     <h1>Data Playground — Eksplorasi Interaktif Statistika</h1>
     
-    <!-- Bagian Identitas Mahasiswa -->
+    <!-- Bagian Identitas Siswa -->
     <div class="card identity-card">
-      <h2 class="card-title">Identitas Mahasiswa</h2>
+      <h2 class="card-title">Identitas Siswa</h2>
       <div class="identity-input">
-        <label for="studentId">Masukkan NIM/Nama Anda:</label>
-        <input type="text" id="studentId" placeholder="Contoh: 123456789 atau Nama Anda">
+        <label for="studentId">Masukkan Nama/Absen Anda:</label>
+        <input type="text" id="studentId" placeholder="Contoh: Ahmad Rizki atau 10">
         <button onclick="generateTask()">Generate Tugas</button>
       </div>
       <div id="taskInstruction" class="task-instruction" style="display: none;">
@@ -38,9 +38,30 @@
       <div class="grid">
         <div class="card">
           <h2 class="card-title">Input Data Tunggal</h2>
-          <textarea id="inputData" placeholder="Masukkan data Anda di sini, dipisahkan dengan koma. Contoh: 10, 12, 9, 15, 20, 18, 14"></textarea>
+          <p class="help-text">Masukkan nilai dan jumlah kemunculannya pada tabel di bawah. Contoh: nilai 15 muncul 3 kali.</p>
+          
+          <div class="table-input-container">
+            <table id="dataTunggalTable" class="data-input-table">
+              <thead>
+                <tr>
+                  <th>Nilai</th>
+                  <th>Jumlah</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dataTunggalTableBody">
+                <tr>
+                  <td><input type="number" class="nilai-input" placeholder="15" step="any" /></td>
+                  <td><input type="number" class="jumlah-input" placeholder="3" min="1" /></td>
+                  <td><button class="delete-row-btn" onclick="deleteRowTunggal(this)">🗑️</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="secondary" onclick="addRowTunggal()">+ Tambah Baris</button>
+          </div>
+          
           <div>
-            <button onclick="prosesData()">Terapkan Data</button>
+            <button onclick="prosesDataFromTable()">Terapkan Data</button>
             <button class="secondary" onclick="loadContohData()">Contoh Dataset</button>
             <button class="danger" onclick="clearData()">Kosongkan</button>
           </div>
@@ -71,23 +92,19 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="stat-label">N</div>
-            <div class="stat-value" id="n-value">7</div>
+            <div class="stat-value" id="n-value">0</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Mean</div>
-            <div class="stat-value" id="mean-value">14.00</div>
+            <div class="stat-value" id="mean-value">0.00</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Median</div>
-            <div class="stat-value" id="median-value">14</div>
+            <div class="stat-value" id="median-value">0</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Mode</div>
-            <div class="stat-value" id="mode-value">10</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Std Dev</div>
-            <div class="stat-value" id="std-value">3.74</div>
+            <div class="stat-value" id="mode-value">-</div>
           </div>
         </div>
       </div>
@@ -100,10 +117,30 @@
       <div class="grid">
         <div class="card">
           <h2 class="card-title">Input Data Kelompok</h2>
-          <p class="help-text">Masukkan data kelompok dengan format: interval bawah-interval atas:frekuensi. Contoh: 1-10:5, 11-20:8, 21-30:12</p>
-          <textarea id="inputDataKelompok" placeholder="Masukkan data kelompok di sini. Contoh: 1-10:5, 11-20:8, 21-30:12"></textarea>
+          <p class="help-text">Masukkan data kelompok pada tabel di bawah. Tambah baris baru dengan klik tombol "+Tambah Baris".</p>
+          
+          <div class="table-input-container">
+            <table id="dataKelompokTable" class="data-input-table">
+              <thead>
+                <tr>
+                  <th>Interval</th>
+                  <th>Frekuensi</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dataKelompokTableBody">
+                <tr>
+                  <td><input type="text" class="interval-input" placeholder="1-10" /></td>
+                  <td><input type="number" class="frekuensi-input" placeholder="5" min="1" /></td>
+                  <td><button class="delete-row-btn" onclick="deleteRowKelompok(this)">🗑️</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="secondary" onclick="addRowKelompok()">+ Tambah Baris</button>
+          </div>
+          
           <div>
-            <button onclick="prosesDataKelompok()">Terapkan Data</button>
+            <button onclick="prosesDataKelompokFromTable()">Terapkan Data</button>
             <button class="secondary" onclick="loadContohDataKelompok()">Contoh Dataset</button>
             <button class="danger" onclick="clearDataKelompok()">Kosongkan</button>
           </div>
@@ -134,23 +171,19 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">N</div>
-              <div class="stat-value" id="n-value-kelompok">25</div>
+              <div class="stat-value" id="n-value-kelompok">0</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Mean</div>
-              <div class="stat-value" id="mean-value-kelompok">27.40</div>
+              <div class="stat-value" id="mean-value-kelompok">0.00</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Median</div>
-              <div class="stat-value" id="median-value-kelompok">28</div>
+              <div class="stat-value" id="median-value-kelompok">0</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Mode</div>
-              <div class="stat-value" id="mode-value-kelompok">35</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Std Dev</div>
-              <div class="stat-value" id="std-value-kelompok">8.20</div>
+              <div class="stat-value" id="mode-value-kelompok">-</div>
             </div>
           </div>
         </div>

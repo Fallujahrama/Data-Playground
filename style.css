@@ -494,6 +494,106 @@ tr:nth-child(even) {
   font-size: 14px;
 }
 
+/* ===== TABEL INPUT DATA KELOMPOK ===== */
+.table-input-container {
+  margin-bottom: 15px;
+}
+
+.data-input-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.data-input-table thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.data-input-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.data-input-table th:last-child {
+  text-align: center;
+  width: 80px;
+}
+
+.data-input-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.data-input-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.data-input-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-input-table td {
+  padding: 8px 12px;
+}
+
+.data-input-table td:last-child {
+  text-align: center;
+}
+
+.data-input-table input[type="text"],
+.data-input-table input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.data-input-table input[type="text"]:focus,
+.data-input-table input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.interval-input {
+  font-weight: 500;
+}
+
+.nilai-input {
+  font-weight: 500;
+  text-align: center;
+}
+
+.frekuensi-input,
+.jumlah-input {
+  text-align: center;
+}
+
+.delete-row-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px 10px;
+  transition: transform 0.2s;
+  border-radius: 4px;
+}
+
+.delete-row-btn:hover {
+  background-color: #ffebee;
+  transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
   .identity-input {
     flex-direction: column;
@@ -507,5 +607,20 @@ tr:nth-child(even) {
   .identity-input input,
   .identity-input button {
     width: 100%;
+  }
+  
+  .data-input-table {
+    font-size: 13px;
+  }
+  
+  .data-input-table th,
+  .data-input-table td {
+    padding: 8px 6px;
+  }
+  
+  .data-input-table input[type="text"],
+  .data-input-table input[type="number"] {
+    font-size: 13px;
+    padding: 6px 8px;
   }
 }
