@@ -42,12 +42,12 @@ const tugasDataKelompok = [
   "Masukkan data kelompok berat badan (dalam kg) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok usia (dalam tahun) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok nilai ujian statistika teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok jumlah jam belajar per minggu teman sekelas Anda (minimal 5 kelompok)",
+  "Masukkan data kelompok waktu belajar per hari (dalam menit) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok jarak rumah ke sekolah (dalam km) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok uang saku bulanan (dalam ribuan rupiah) teman sekelas Anda (minimal 5 kelompok)",
   "Masukkan data kelompok nilai rata-rata rapor teman sekelas Anda (skala 0-100, minimal 5 kelompok)",
   "Masukkan data kelompok jumlah kehadiran sekolah per bulan teman sekelas Anda (minimal 5 kelompok)",
-  "Masukkan data kelompok waktu mengerjakan PR (dalam jam) teman sekelas Anda (minimal 5 kelompok)"
+  "Masukkan data kelompok waktu mengerjakan PR (dalam menit) teman sekelas Anda (minimal 5 kelompok)"
 ];
 
 // Variabel untuk menyimpan tugas yang di-generate
@@ -240,6 +240,34 @@ function clearData() {
   document.getElementById("mean-value").textContent = "0.00";
   document.getElementById("median-value").textContent = "0";
   document.getElementById("mode-value").textContent = "-";
+  
+  // Sembunyikan section nilai tambahan
+  document.getElementById("additionalDataSection").style.display = "none";
+  
+  // Reset tabel nilai tambahan
+  const additionalTbody = document.getElementById("additionalDataTableBody");
+  additionalTbody.innerHTML = `
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="25" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="30" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="35" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="40" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="number" class="nilai-input" placeholder="45" step="any" /></td>
+      <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+    </tr>
+  `;
   
   // Hapus chart jika ada
   if (histogramChart) {
@@ -570,6 +598,149 @@ function prosesDataFromTable() {
   let freq = {};
   sorted.forEach(v => freq[v] = (freq[v] || 0) + 1); // Hitung frekuensi masing-masing nilai
   let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b); // Temukan nilai dengan frekuensi tertinggi
+  
+  // Update statistik cards
+  document.getElementById("n-value").textContent = sorted.length;
+  document.getElementById("mean-value").textContent = mean.toFixed(2);
+  document.getElementById("median-value").textContent = median;
+  document.getElementById("mode-value").textContent = mode;
+  
+  // Update tabel preview
+  let tableHtml = "<table><tr><th>No.</th><th>Data</th></tr>";
+  for (let i = 0; i < sorted.length; i++) {
+    tableHtml += `<tr><td>${i + 1}</td><td>${sorted[i]}</td></tr>`;
+  }
+  tableHtml += "</table>";
+  document.getElementById("tableOutput").innerHTML = tableHtml;
+  
+  // Tampilkan langkah perhitungan jika checkbox dicentang
+  if (document.getElementById("showSteps").checked) {
+    tampilkanLangkahPerhitungan(sorted, mean, median, mode);
+  }
+  
+  // Buat histogram
+  createHistogram(sorted);
+  
+  // Tampilkan section untuk input 5 nilai tambahan
+  document.getElementById("additionalDataSection").style.display = "block";
+}
+
+/**
+ * Fungsi untuk memproses data dengan menambahkan 5 nilai tambahan
+ */
+function prosesDataWithAdditional() {
+  console.log("prosesDataWithAdditional dipanggil");
+  
+  // Ambil data dari tabel utama
+  const mainTbody = document.getElementById("dataTunggalTableBody");
+  const mainRows = mainTbody.getElementsByTagName("tr");
+  
+  // Ambil data dari tabel tambahan
+  const additionalTbody = document.getElementById("additionalDataTableBody");
+  const additionalRows = additionalTbody.getElementsByTagName("tr");
+  
+  let data = [];
+  let hasError = false;
+  
+  // Ambil data dari tabel utama
+  for (let i = 0; i < mainRows.length; i++) {
+    const nilaiInput = mainRows[i].querySelector(".nilai-input");
+    const jumlahInput = mainRows[i].querySelector(".jumlah-input");
+    
+    const nilaiValue = nilaiInput.value.trim();
+    const jumlahValue = jumlahInput.value.trim();
+    
+    if (!nilaiValue && !jumlahValue) continue;
+    
+    if (!nilaiValue || !jumlahValue) {
+      alert(`Tabel Utama - Baris ${i + 1}: Harap isi data dan frekuensi!`);
+      hasError = true;
+      break;
+    }
+    
+    const nilai = parseFloat(nilaiValue);
+    const jumlah = parseInt(jumlahValue);
+    
+    if (isNaN(nilai) || isNaN(jumlah) || jumlah < 1) {
+      alert(`Tabel Utama - Baris ${i + 1}: Input tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    for (let j = 0; j < jumlah; j++) {
+      data.push(nilai);
+    }
+  }
+  
+  if (hasError) return;
+  
+  // Ambil data dari tabel tambahan
+  let additionalCount = 0;
+  for (let i = 0; i < additionalRows.length; i++) {
+    const nilaiInput = additionalRows[i].querySelector(".nilai-input");
+    const jumlahInput = additionalRows[i].querySelector(".jumlah-input");
+    
+    const nilaiValue = nilaiInput.value.trim();
+    const jumlahValue = jumlahInput.value.trim();
+    
+    if (!nilaiValue) continue; // Skip baris kosong
+    
+    const nilai = parseFloat(nilaiValue);
+    const jumlah = jumlahValue ? parseInt(jumlahValue) : 1;
+    
+    if (isNaN(nilai) || isNaN(jumlah) || jumlah < 1) {
+      alert(`Data Tambahan - Baris ${i + 1}: Input tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    for (let j = 0; j < jumlah; j++) {
+      data.push(nilai);
+    }
+    additionalCount++;
+  }
+  
+  if (hasError) return;
+  
+  if (additionalCount === 0) {
+    alert("Harap isi minimal 1 nilai tambahan untuk eksplorasi!");
+    return;
+  }
+  
+  if (data.length === 0) {
+    alert("Tidak ada data yang dimasukkan!");
+    return;
+  }
+  
+  // Reset output area
+  document.getElementById("output").innerHTML = "";
+  
+  // Urutkan data
+  let sorted = [...data].sort((a, b) => a - b);
+  
+  console.log("Data gabungan setelah diurutkan:", sorted);
+  
+  // Update variabel global
+  currentData = sorted;
+  
+  // Update informasi jumlah data
+  document.getElementById("dataCount").textContent = `Data saat ini: ${sorted.length} nilai (termasuk ${additionalCount} nilai tambahan)`;
+  
+  // ===== PERHITUNGAN STATISTIK =====
+  
+  // Hitung mean (rata-rata)
+  let sum = sorted.reduce((a, b) => a + b, 0);
+  let mean = sum / sorted.length;
+  
+  // Hitung median (nilai tengah)
+  let median = (sorted.length % 2 === 1)
+    ? sorted[Math.floor(sorted.length/2)]
+    : (sorted[sorted.length/2 - 1] + sorted[sorted.length/2]) / 2;
+  
+  // Hitung modus (nilai yang paling sering muncul)
+  let freq = {};
+  sorted.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b);
   
   // Update statistik cards
   document.getElementById("n-value").textContent = sorted.length;

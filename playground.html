@@ -38,14 +38,14 @@
       <div class="grid">
         <div class="card">
           <h2 class="card-title">Input Data Tunggal</h2>
-          <p class="help-text">Masukkan nilai dan jumlah kemunculannya pada tabel di bawah. Contoh: nilai 15 muncul 3 kali.</p>
+          <p class="help-text">Masukkan nilai data dan frekuensi kemunculannya pada tabel di bawah. Contoh: data 15 muncul 3 kali.</p>
           
           <div class="table-input-container">
             <table id="dataTunggalTable" class="data-input-table">
               <thead>
                 <tr>
-                  <th>Nilai</th>
-                  <th>Jumlah</th>
+                  <th>Data</th>
+                  <th>Frekuensi</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -69,6 +69,50 @@
           <div class="checkbox-container">
             <input type="checkbox" id="showSteps" checked>
             <label for="showSteps">Tampilkan langkah perhitungan</label>
+          </div>
+          
+          <!-- Bagian untuk menambah 5 nilai tambahan -->
+          <div id="additionalDataSection" style="display: none; margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <h3 style="color: #856404; font-size: 16px; margin-bottom: 10px;">📊 Tugas Eksplorasi</h3>
+            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">
+              Sekarang tambahkan 5 nilai data baru di bawah ini untuk mengamati bagaimana statistik berubah!
+            </p>
+            <div class="table-input-container">
+              <table id="additionalDataTable" class="data-input-table">
+                <thead>
+                  <tr>
+                    <th>Data Tambahan</th>
+                    <th>Frekuensi</th>
+                  </tr>
+                </thead>
+                <tbody id="additionalDataTableBody">
+                  <tr>
+                    <td><input type="number" class="nilai-input" placeholder="25" step="any" /></td>
+                    <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="number" class="nilai-input" placeholder="30" step="any" /></td>
+                    <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="number" class="nilai-input" placeholder="35" step="any" /></td>
+                    <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="number" class="nilai-input" placeholder="40" step="any" /></td>
+                    <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="number" class="nilai-input" placeholder="45" step="any" /></td>
+                    <td><input type="number" class="jumlah-input" placeholder="1" min="1" value="1" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button onclick="prosesDataWithAdditional()" style="margin-top: 10px;">Terapkan Data + 5 Nilai Tambahan</button>
+            <p style="color: #856404; font-size: 12px; margin-top: 10px; font-style: italic;">
+              💡 Amati: Bagaimana Mean, Median, dan Mode berubah setelah menambahkan data baru?
+            </p>
           </div>
         </div>
         
