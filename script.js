@@ -8,9 +8,28 @@
 // Variabel untuk menyimpan chart histogram yang akan diperbarui
 let histogramChart;
 let histogramChartKelompok;
+let histogramAdditionalChart = null;
+let histogramKelompokAdditionalChart = null;
 
 // Data awal yang ditampilkan saat aplikasi pertama kali dijalankan
 let currentData = [10, 12, 9, 15, 20, 18, 14];
+
+// Data asli yang akan disimpan untuk perbandingan
+let originalData = {
+  values: [],
+  n: 0,
+  mean: 0,
+  median: 0,
+  mode: '-'
+};
+
+let originalDataKelompok = {
+  intervals: [],
+  n: 0,
+  mean: 0,
+  median: 0,
+  mode: '-'
+};
 
 // Data awal untuk data kelompok (format: [[batas_bawah, batas_atas, frekuensi], ...])
 let currentDataKelompok = [
@@ -273,6 +292,15 @@ function clearData() {
   if (histogramChart) {
     histogramChart.destroy();
   }
+  
+  // Reset data original
+  originalData = {
+    values: [],
+    n: 0,
+    mean: 0,
+    median: 0,
+    mode: '-'
+  };
 }
 
 /**
@@ -618,8 +646,17 @@ function prosesDataFromTable() {
     tampilkanLangkahPerhitungan(sorted, mean, median, mode);
   }
   
-  // Buat histogram
+  // Buat histogram - PENTING: Ini harus dipanggil!
   createHistogram(sorted);
+  
+  // Simpan data original untuk perbandingan
+  originalData = {
+    values: sorted,
+    n: sorted.length,
+    mean: mean,
+    median: median,
+    mode: mode
+  };
   
   // Tampilkan section untuk input 5 nilai tambahan
   document.getElementById("additionalDataSection").style.display = "block";
@@ -726,43 +763,123 @@ function prosesDataWithAdditional() {
   // Update informasi jumlah data
   document.getElementById("dataCount").textContent = `Data saat ini: ${sorted.length} nilai (termasuk ${additionalCount} nilai tambahan)`;
   
-  // ===== PERHITUNGAN STATISTIK =====
-  
-  // Hitung mean (rata-rata)
+  // Hitung statistik untuk data gabungan (untuk langkah perhitungan)
   let sum = sorted.reduce((a, b) => a + b, 0);
   let mean = sum / sorted.length;
   
-  // Hitung median (nilai tengah)
   let median = (sorted.length % 2 === 1)
     ? sorted[Math.floor(sorted.length/2)]
     : (sorted[sorted.length/2 - 1] + sorted[sorted.length/2]) / 2;
   
-  // Hitung modus (nilai yang paling sering muncul)
   let freq = {};
   sorted.forEach(v => freq[v] = (freq[v] || 0) + 1);
   let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b);
   
-  // Update statistik cards
-  document.getElementById("n-value").textContent = sorted.length;
-  document.getElementById("mean-value").textContent = mean.toFixed(2);
-  document.getElementById("median-value").textContent = median;
-  document.getElementById("mode-value").textContent = mode;
-  
-  // Update tabel preview
-  let tableHtml = "<table><tr><th>No.</th><th>Data</th></tr>";
-  for (let i = 0; i < sorted.length; i++) {
-    tableHtml += `<tr><td>${i + 1}</td><td>${sorted[i]}</td></tr>`;
-  }
-  tableHtml += "</table>";
-  document.getElementById("tableOutput").innerHTML = tableHtml;
-  
-  // Tampilkan langkah perhitungan jika checkbox dicentang
+  // Tampilkan langkah perhitungan untuk data gabungan jika checkbox dicentang
   if (document.getElementById("showSteps").checked) {
     tampilkanLangkahPerhitungan(sorted, mean, median, mode);
   }
   
-  // Buat histogram
-  createHistogram(sorted);
+  // JANGAN UPDATE GRAFIK PERTAMA - biarkan tetap menampilkan data asli
+  // Grafik pertama sudah di-render saat prosesDataFromTable()
+  
+  // Tampilkan histogram kedua untuk perbandingan dengan data gabungan
+  showAdditionalHistogram(sorted);
+}
+
+/**
+ * Fungsi untuk menampilkan histogram tambahan di bawah histogram pertama
+ */
+function showAdditionalHistogram(data) {
+  // Tampilkan section histogram tambahan
+  document.getElementById("additionalHistogramSection").style.display = "block";
+  
+  // Buat histogram kedua
+  createAdditionalHistogram(data);
+  
+  // Hitung statistik untuk data gabungan
+  let sum = data.reduce((a, b) => a + b, 0);
+  let mean = sum / data.length;
+  
+  let median = (data.length % 2 === 1)
+    ? data[Math.floor(data.length/2)]
+    : (data[data.length/2 - 1] + data[data.length/2]) / 2;
+  
+  let freq = {};
+  data.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  let mode = Object.keys(freq).reduce((a,b) => freq[a] > freq[b] ? a : b);
+  
+  // Update nilai statistik tambahan
+  document.getElementById("n-value-additional").textContent = data.length;
+  document.getElementById("mean-value-additional").textContent = mean.toFixed(2);
+  document.getElementById("median-value-additional").textContent = median;
+  document.getElementById("mode-value-additional").textContent = mode;
+}
+
+/**
+ * Fungsi untuk membuat histogram data tambahan
+ */
+function createAdditionalHistogram(data) {
+  const ctx = document.getElementById("histogramAdditional");
+  if (!ctx) return;
+  
+  // Hancurkan chart lama jika ada
+  if (histogramAdditionalChart) {
+    histogramAdditionalChart.destroy();
+  }
+  
+  // Hitung frekuensi
+  let freq = {};
+  data.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  
+  // Urutkan nilai untuk sumbu X
+  let labels = Object.keys(freq).map(Number).sort((a, b) => a - b);
+  let frequencies = labels.map(v => freq[v]);
+  
+  // Buat chart baru dengan warna orange
+  histogramAdditionalChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Frekuensi',
+        data: frequencies,
+        backgroundColor: '#f57c00',
+        borderColor: '#f57c00',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: false
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Nilai Data'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Frekuensi'
+          },
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
 }
 
 /**
@@ -1163,10 +1280,47 @@ function clearDataKelompok() {
   document.getElementById("median-value-kelompok").textContent = "0";
   document.getElementById("mode-value-kelompok").textContent = "-";
   
+  // Sembunyikan section nilai tambahan
+  document.getElementById("additionalDataSectionKelompok").style.display = "none";
+  
+  // Reset tabel nilai tambahan
+  const additionalTbody = document.getElementById("additionalDataTableBodyKelompok");
+  additionalTbody.innerHTML = `
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="31-40" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="3" min="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="41-50" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="4" min="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="51-60" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="2" min="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="61-70" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="5" min="1" /></td>
+    </tr>
+    <tr>
+      <td><input type="text" class="interval-input" placeholder="71-80" /></td>
+      <td><input type="number" class="frekuensi-input" placeholder="3" min="1" /></td>
+    </tr>
+  `;
+  
   // Hapus chart jika ada
   if (histogramChartKelompok) {
     histogramChartKelompok.destroy();
   }
+  
+  // Reset data original
+  originalDataKelompok = {
+    intervals: [],
+    n: 0,
+    mean: 0,
+    median: 0,
+    mode: '-'
+  };
 }
 
 /**
@@ -1387,6 +1541,269 @@ function prosesDataKelompokFromTable() {
   
   // Buat histogram untuk data kelompok
   createHistogramKelompok(dataKelompok);
+  
+  // Simpan data original untuk perbandingan
+  originalDataKelompok = {
+    intervals: dataKelompok,
+    n: stats.n,
+    mean: stats.mean,
+    median: stats.median,
+    mode: stats.mode
+  };
+  
+  // Tampilkan section untuk input 5 kelompok tambahan
+  document.getElementById("additionalDataSectionKelompok").style.display = "block";
+  
+  // Sembunyikan kartu perbandingan
+  document.getElementById("comparisonCardKelompok").style.display = "none";
+}
+
+/**
+ * Fungsi untuk memproses data kelompok dengan menambahkan 5 kelompok tambahan
+ */
+function prosesDataKelompokWithAdditional() {
+  console.log("prosesDataKelompokWithAdditional dipanggil");
+  
+  // Ambil data dari tabel utama
+  const mainTbody = document.getElementById("dataKelompokTableBody");
+  const mainRows = mainTbody.getElementsByTagName("tr");
+  
+  // Ambil data dari tabel tambahan
+  const additionalTbody = document.getElementById("additionalDataTableBodyKelompok");
+  const additionalRows = additionalTbody.getElementsByTagName("tr");
+  
+  let dataKelompok = [];
+  let hasError = false;
+  
+  // Ambil data dari tabel utama
+  for (let i = 0; i < mainRows.length; i++) {
+    const intervalInput = mainRows[i].querySelector(".interval-input");
+    const frekuensiInput = mainRows[i].querySelector(".frekuensi-input");
+    
+    const intervalValue = intervalInput.value.trim();
+    const frekuensiValue = frekuensiInput.value.trim();
+    
+    if (!intervalValue && !frekuensiValue) continue;
+    
+    if (!intervalValue || !frekuensiValue) {
+      alert(`Tabel Utama - Baris ${i + 1}: Harap isi interval dan frekuensi!`);
+      hasError = true;
+      break;
+    }
+    
+    const intervalParts = intervalValue.split('-');
+    if (intervalParts.length !== 2) {
+      alert(`Tabel Utama - Baris ${i + 1}: Format interval tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    const batasBawah = parseInt(intervalParts[0].trim());
+    const batasAtas = parseInt(intervalParts[1].trim());
+    const frekuensi = parseInt(frekuensiValue);
+    
+    if (isNaN(batasBawah) || isNaN(batasAtas) || isNaN(frekuensi) || frekuensi < 1) {
+      alert(`Tabel Utama - Baris ${i + 1}: Input tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    dataKelompok.push([batasBawah, batasAtas, frekuensi]);
+  }
+  
+  if (hasError) return;
+  
+  // Ambil data dari tabel tambahan
+  let additionalCount = 0;
+  for (let i = 0; i < additionalRows.length; i++) {
+    const intervalInput = additionalRows[i].querySelector(".interval-input");
+    const frekuensiInput = additionalRows[i].querySelector(".frekuensi-input");
+    
+    const intervalValue = intervalInput.value.trim();
+    const frekuensiValue = frekuensiInput.value.trim();
+    
+    if (!intervalValue) continue; // Skip baris kosong
+    
+    const intervalParts = intervalValue.split('-');
+    if (intervalParts.length !== 2) {
+      alert(`Data Tambahan - Baris ${i + 1}: Format interval tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    const batasBawah = parseInt(intervalParts[0].trim());
+    const batasAtas = parseInt(intervalParts[1].trim());
+    const frekuensi = frekuensiValue ? parseInt(frekuensiValue) : 1;
+    
+    if (isNaN(batasBawah) || isNaN(batasAtas) || isNaN(frekuensi) || frekuensi < 1) {
+      alert(`Data Tambahan - Baris ${i + 1}: Input tidak valid!`);
+      hasError = true;
+      break;
+    }
+    
+    // Cek apakah interval yang sama sudah ada, jika ya gabungkan frekuensinya
+    let found = false;
+    for (let j = 0; j < dataKelompok.length; j++) {
+      if (dataKelompok[j][0] === batasBawah && dataKelompok[j][1] === batasAtas) {
+        dataKelompok[j][2] += frekuensi; // Gabungkan frekuensi
+        found = true;
+        break;
+      }
+    }
+    
+    // Jika interval belum ada, tambahkan sebagai interval baru
+    if (!found) {
+      dataKelompok.push([batasBawah, batasAtas, frekuensi]);
+    }
+    
+    additionalCount++;
+  }
+  
+  if (hasError) return;
+  
+  if (additionalCount === 0) {
+    alert("Harap isi minimal 1 kelompok tambahan untuk eksplorasi!");
+    return;
+  }
+  
+  if (dataKelompok.length === 0) {
+    alert("Tidak ada data yang dimasukkan!");
+    return;
+  }
+  
+  // Reset output area
+  document.getElementById("outputKelompok").innerHTML = "";
+  
+  // Urutkan dataKelompok berdasarkan batas bawah
+  dataKelompok.sort((a, b) => a[0] - b[0]);
+  
+  console.log("Data kelompok gabungan setelah diurutkan:", dataKelompok);
+  
+  // Update variabel global
+  currentDataKelompok = dataKelompok;
+  
+  // Hitung total nilai
+  let totalNilai = dataKelompok.reduce((sum, item) => sum + item[2], 0);
+  
+  // Update informasi jumlah data
+  document.getElementById("dataCountKelompok").textContent = `Data saat ini: ${dataKelompok.length} kelompok (termasuk ${additionalCount} kelompok tambahan), ${totalNilai} nilai`;
+  
+  // Hitung statistik untuk data kelompok gabungan (untuk langkah perhitungan)
+  let stats = hitungStatistikKelompok(dataKelompok);
+  
+  // JANGAN UPDATE STATISTIK CARDS UTAMA - biarkan menampilkan data asli
+  
+  // Update table untuk data gabungan
+  let tableHtml = "<table><tr><th>Interval</th><th>Frekuensi</th><th>Nilai Tengah</th><th>f×x</th></tr>";
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    let frekuensi = dataKelompok[i][2];
+    let nilaiTengah = (dataKelompok[i][0] + dataKelompok[i][1]) / 2;
+    let fx = frekuensi * nilaiTengah;
+    
+    tableHtml += `<tr><td>${interval}</td><td>${frekuensi}</td><td>${nilaiTengah}</td><td>${fx}</td></tr>`;
+  }
+  tableHtml += "</table>";
+  document.getElementById("tableOutputKelompok").innerHTML = tableHtml;
+  
+  // Tampilkan langkah perhitungan untuk data gabungan jika checkbox dicentang
+  if (document.getElementById("showStepsKelompok").checked) {
+    tampilkanLangkahPerhitunganKelompok(dataKelompok, stats);
+  }
+  
+  // JANGAN UPDATE GRAFIK PERTAMA - biarkan tetap menampilkan data asli
+  // Grafik pertama sudah di-render saat prosesDataKelompokFromTable()
+  
+  // Tampilkan histogram kedua untuk perbandingan dengan data gabungan
+  showAdditionalHistogramKelompok(dataKelompok);
+}
+
+/**
+ * Fungsi untuk menampilkan histogram tambahan kelompok di bawah histogram pertama
+ */
+function showAdditionalHistogramKelompok(dataKelompok) {
+  // Tampilkan section histogram tambahan
+  document.getElementById("additionalHistogramSectionKelompok").style.display = "block";
+  
+  // Buat histogram kedua
+  createAdditionalHistogramKelompok(dataKelompok);
+  
+  // Hitung statistik untuk data kelompok gabungan
+  const stats = hitungStatistikKelompok(dataKelompok);
+  
+  // Update nilai statistik tambahan kelompok
+  document.getElementById("n-value-kelompok-additional").textContent = stats.n;
+  document.getElementById("mean-value-kelompok-additional").textContent = stats.mean.toFixed(2);
+  document.getElementById("median-value-kelompok-additional").textContent = stats.median;
+  document.getElementById("mode-value-kelompok-additional").textContent = stats.mode;
+}
+
+/**
+ * Fungsi untuk membuat histogram data kelompok tambahan
+ */
+function createAdditionalHistogramKelompok(dataKelompok) {
+  const ctx = document.getElementById("histogramKelompokAdditional");
+  if (!ctx) return;
+  
+  // Hancurkan chart lama jika ada
+  if (histogramKelompokAdditionalChart) {
+    histogramKelompokAdditionalChart.destroy();
+  }
+  
+  // Siapkan data untuk chart
+  let labels = [];
+  let frequencies = [];
+  
+  for (let i = 0; i < dataKelompok.length; i++) {
+    let interval = `${dataKelompok[i][0]}-${dataKelompok[i][1]}`;
+    labels.push(interval);
+    frequencies.push(dataKelompok[i][2]);
+  }
+  
+  // Buat chart baru dengan warna orange
+  histogramKelompokAdditionalChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Frekuensi',
+        data: frequencies,
+        backgroundColor: '#f57c00',
+        borderColor: '#f57c00',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: false
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Interval Kelas'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Frekuensi'
+          },
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
 }
 
 /**

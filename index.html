@@ -114,6 +114,7 @@
               💡 Amati: Bagaimana Mean, Median, dan Mode berubah setelah menambahkan data baru?
             </p>
           </div>
+          
         </div>
       
       <div class="card">
@@ -127,29 +128,56 @@
         
         <div id="histogram-tab" class="tab-content active">
           <canvas id="histogramChart"></canvas>
+          
+          <!-- Statistik untuk data ASLI langsung di bawah histogram pertama -->
+          <div class="stat-grid" style="margin-top: 20px;">
+            <div class="stat-card">
+              <div class="stat-label">N</div>
+              <div class="stat-value" id="n-value">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Mean</div>
+              <div class="stat-value" id="mean-value">0.00</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Median</div>
+              <div class="stat-value" id="median-value">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Mode</div>
+              <div class="stat-value" id="mode-value">-</div>
+            </div>
+          </div>
+          
+          <!-- Histogram tambahan (muncul setelah klik "Terapkan Data + 5 Nilai Tambahan") -->
+          <div id="additionalHistogramSection" style="display: none; margin-top: 40px; padding-top: 30px; border-top: 2px dashed #ddd;">
+            <h3 style="color: #f57c00; font-size: 14px; margin-bottom: 10px; text-align: center;">📊 Histogram Data + 5 Nilai Tambahan</h3>
+            <canvas id="histogramAdditional"></canvas>
+            
+            <!-- Statistik untuk data tambahan -->
+            <div class="stat-grid" style="margin-top: 20px;">
+              <div class="stat-card" style="background: #fff3e0;">
+                <div class="stat-label">N (+ Tambahan)</div>
+                <div class="stat-value" id="n-value-additional">0</div>
+              </div>
+              <div class="stat-card" style="background: #fff3e0;">
+                <div class="stat-label">Mean (+ Tambahan)</div>
+                <div class="stat-value" id="mean-value-additional">0.00</div>
+              </div>
+              <div class="stat-card" style="background: #fff3e0;">
+                <div class="stat-label">Median (+ Tambahan)</div>
+                <div class="stat-value" id="median-value-additional">0</div>
+              </div>
+              <div class="stat-card" style="background: #fff3e0;">
+                <div class="stat-label">Mode (+ Tambahan)</div>
+                <div class="stat-value" id="mode-value-additional">-</div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div id="table-tab" class="tab-content">
           <div id="tableOutput"></div>
-        </div>
-        
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-label">N</div>
-            <div class="stat-value" id="n-value">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Mean</div>
-            <div class="stat-value" id="mean-value">0.00</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Median</div>
-            <div class="stat-value" id="median-value">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Mode</div>
-            <div class="stat-value" id="mode-value">-</div>
-          </div>
         </div>
       </div>
     </div>
@@ -193,6 +221,50 @@
             <input type="checkbox" id="showStepsKelompok" checked>
             <label for="showStepsKelompok">Tampilkan langkah perhitungan</label>
           </div>
+          
+          <!-- Bagian untuk menambah 5 nilai tambahan - Data Kelompok -->
+          <div id="additionalDataSectionKelompok" style="display: none; margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <h3 style="color: #856404; font-size: 16px; margin-bottom: 10px;">📊 Tugas Eksplorasi</h3>
+            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">
+              Sekarang tambahkan 5 kelompok data baru di bawah ini untuk mengamati bagaimana statistik berubah!
+            </p>
+            <div class="table-input-container">
+              <table id="additionalDataTableKelompok" class="data-input-table">
+                <thead>
+                  <tr>
+                    <th>Interval Tambahan</th>
+                    <th>Frekuensi</th>
+                  </tr>
+                </thead>
+                <tbody id="additionalDataTableBodyKelompok">
+                  <tr>
+                    <td><input type="text" class="interval-input" placeholder="31-40" /></td>
+                    <td><input type="number" class="frekuensi-input" placeholder="3" min="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" class="interval-input" placeholder="41-50" /></td>
+                    <td><input type="number" class="frekuensi-input" placeholder="4" min="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" class="interval-input" placeholder="51-60" /></td>
+                    <td><input type="number" class="frekuensi-input" placeholder="2" min="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" class="interval-input" placeholder="61-70" /></td>
+                    <td><input type="number" class="frekuensi-input" placeholder="5" min="1" /></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" class="interval-input" placeholder="71-80" /></td>
+                    <td><input type="number" class="frekuensi-input" placeholder="3" min="1" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button onclick="prosesDataKelompokWithAdditional()" style="margin-top: 10px;">Terapkan Data + 5 Kelompok Tambahan</button>
+            <p style="color: #856404; font-size: 12px; margin-top: 10px; font-style: italic;">
+              💡 Amati: Bagaimana Mean, Median, dan Mode berubah setelah menambahkan kelompok data baru?
+            </p>
+          </div>
         </div>
         
         <div class="card">
@@ -206,29 +278,56 @@
           
           <div id="histogramKelompok-tab" class="tab-content active">
             <canvas id="histogramChartKelompok"></canvas>
+            
+            <!-- Statistik untuk data kelompok ASLI langsung di bawah histogram pertama -->
+            <div class="stat-grid" style="margin-top: 20px;">
+              <div class="stat-card">
+                <div class="stat-label">N</div>
+                <div class="stat-value" id="n-value-kelompok">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Mean</div>
+                <div class="stat-value" id="mean-value-kelompok">0.00</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Median</div>
+                <div class="stat-value" id="median-value-kelompok">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Mode</div>
+                <div class="stat-value" id="mode-value-kelompok">-</div>
+              </div>
+            </div>
+            
+            <!-- Histogram tambahan (muncul setelah klik "Terapkan Data + 5 Kelompok Tambahan") -->
+            <div id="additionalHistogramSectionKelompok" style="display: none; margin-top: 40px; padding-top: 30px; border-top: 2px dashed #ddd;">
+              <h3 style="color: #f57c00; font-size: 14px; margin-bottom: 10px; text-align: center;">📊 Histogram Data + 5 Kelompok Tambahan</h3>
+              <canvas id="histogramKelompokAdditional"></canvas>
+              
+              <!-- Statistik untuk data kelompok tambahan -->
+              <div class="stat-grid" style="margin-top: 20px;">
+                <div class="stat-card" style="background: #fff3e0;">
+                  <div class="stat-label">N (+ Tambahan)</div>
+                  <div class="stat-value" id="n-value-kelompok-additional">0</div>
+                </div>
+                <div class="stat-card" style="background: #fff3e0;">
+                  <div class="stat-label">Mean (+ Tambahan)</div>
+                  <div class="stat-value" id="mean-value-kelompok-additional">0.00</div>
+                </div>
+                <div class="stat-card" style="background: #fff3e0;">
+                  <div class="stat-label">Median (+ Tambahan)</div>
+                  <div class="stat-value" id="median-value-kelompok-additional">0</div>
+                </div>
+                <div class="stat-card" style="background: #fff3e0;">
+                  <div class="stat-label">Mode (+ Tambahan)</div>
+                  <div class="stat-value" id="mode-value-kelompok-additional">-</div>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div id="tableKelompok-tab" class="tab-content">
             <div id="tableOutputKelompok"></div>
-          </div>
-          
-          <div class="stat-grid">
-            <div class="stat-card">
-              <div class="stat-label">N</div>
-              <div class="stat-value" id="n-value-kelompok">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Mean</div>
-              <div class="stat-value" id="mean-value-kelompok">0.00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Median</div>
-              <div class="stat-value" id="median-value-kelompok">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Mode</div>
-              <div class="stat-value" id="mode-value-kelompok">-</div>
-            </div>
           </div>
         </div>
       </div>
