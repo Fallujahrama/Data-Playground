@@ -326,7 +326,8 @@ function showTab(tabName) {
 }
 
 /**
- * Fungsi untuk membuat histogram dari data
+ * Fungsi untuk membuat histogram dari data tunggal
+ * Menampilkan frekuensi untuk setiap nilai unik
  * @param {Array} data - Array berisi nilai data yang akan divisualisasi
  */
 function createHistogram(data) {
@@ -340,73 +341,18 @@ function createHistogram(data) {
     return;
   }
   
-  // Tentukan nilai minimum dan maksimum data
-  let min = Math.min(...data);
-  let max = Math.max(...data);
-  
-  // Handling kasus nilai min dan max yang sama
-  if (min === max) {
-    min = min - 1;
-    max = max + 1;
-  }
-  
-  // Tentukan jumlah bin (kelompok data) untuk histogram
-  // Pastikan bin minimal 3 dan maksimal 7, menggunakan aturan akar jumlah data
-  let binCount = Math.max(3, Math.min(7, Math.ceil(Math.sqrt(data.length))));
-  
-  // Hitung ukuran bin yang tepat untuk distribusi data
-  let binSize = Math.ceil((max - min) / binCount);
-  
-  // Pastikan binSize tidak nol
-  if (binSize === 0) {
-    binSize = 1;
-  }
-  
-  // Bulatkan nilai minimum ke bawah untuk pembulatan yang lebih baik
-  min = Math.floor(min);
-  
-  // Buat batas-batas bin
-  let bins = [];
-  for (let i = 0; i < binCount; i++) {
-    let binStart = min + i * binSize;
-    let binEnd = binStart + binSize;
-    bins.push({
-      start: binStart,
-      end: binEnd,
-      count: 0
-    });
-  }
-  
-  // Hitung jumlah nilai dalam masing-masing bin
+  // Hitung frekuensi untuk setiap nilai unik
+  let frequency = {};
   data.forEach(value => {
-    let foundBin = false;
-    
-    for (let i = 0; i < bins.length; i++) {
-      // Untuk bin terakhir, nilai pada bin end juga masuk dalam bin tersebut
-      if (i === bins.length - 1) {
-        if (value >= bins[i].start && value <= bins[i].end) {
-          bins[i].count++;
-          foundBin = true;
-          break;
-        }
-      } 
-      // Untuk bin lainnya, nilai pada bin end tidak masuk dalam bin
-      else if (value >= bins[i].start && value < bins[i].end) {
-        bins[i].count++;
-        foundBin = true;
-        break;
-      }
-    }
-    
-    // Jika tidak ada bin yang cocok (seharusnya tidak terjadi), tambahkan ke bin terakhir
-    if (!foundBin && bins.length > 0) {
-      bins[bins.length - 1].count++;
-    }
+    frequency[value] = (frequency[value] || 0) + 1;
   });
   
+  // Urutkan nilai-nilai unik
+  let uniqueValues = Object.keys(frequency).map(Number).sort((a, b) => a - b);
+  
   // Buat label dan data untuk chart
-  let labels = bins.map(bin => `${bin.start}-${bin.end}`);
-  let chartData = bins.map(bin => bin.count);
+  let labels = uniqueValues.map(String); // Nilai tunggal seperti "35", "40", "45"
+  let chartData = uniqueValues.map(val => frequency[val]);
   
   // Buat chart dengan Chart.js
   let ctx = document.getElementById('histogramChart').getContext('2d');
