@@ -1893,12 +1893,27 @@ function hitungStatistikKelompok(dataKelompok) {
   let median = lowerBound + ((n/2 - prevCumulativeFreq) / medianFreq) * width;
   median = Math.round(median);
   
-  // Hitung modus (kelompok dengan frekuensi tertinggi)
+  // Hitung modus menggunakan rumus: Mo = tb + (d1 / (d1 + d2)) × k
   let maxFreq = Math.max(...frekuensi);
   let modeGroupIndex = frekuensi.indexOf(maxFreq);
   let modeGroup = dataKelompok[modeGroupIndex];
   
-  let mode = (modeGroup[0] + modeGroup[1]) / 2;
+  // tb = tepi bawah kelas modus
+  let tb = modeGroup[0] - 0.5;
+  
+  // d1 = frekuensi kelas modus - frekuensi kelas sebelumnya
+  let freqBefore = modeGroupIndex > 0 ? frekuensi[modeGroupIndex - 1] : 0;
+  let d1 = maxFreq - freqBefore;
+  
+  // d2 = frekuensi kelas modus - frekuensi kelas sesudahnya
+  let freqAfter = modeGroupIndex < frekuensi.length - 1 ? frekuensi[modeGroupIndex + 1] : 0;
+  let d2 = maxFreq - freqAfter;
+  
+  // k = panjang kelas
+  let k = modeGroup[1] - modeGroup[0] + 1;
+  
+  // Mo = tb + (d1 / (d1 + d2)) × k
+  let mode = tb + (d1 / (d1 + d2)) * k;
   mode = Math.round(mode);
   
   return {
@@ -2028,7 +2043,7 @@ function tampilkanLangkahPerhitunganKelompok(dataKelompok, stats) {
   
   // MODUS
   html += "<h4>Modus</h4>";
-  html += "<p class='rumus-desc'>Nilai tengah dari kelompok dengan frekuensi tertinggi</p>";
+  html += "<p class='rumus-desc'>Nilai yang paling sering muncul menggunakan rumus modus data kelompok</p>";
   
   let maxFreq = Math.max(...frekuensi);
   let modeGroupIndex = frekuensi.indexOf(maxFreq);
@@ -2036,12 +2051,36 @@ function tampilkanLangkahPerhitunganKelompok(dataKelompok, stats) {
   let modeLowerBound = modeGroup[0];
   let modeUpperBound = modeGroup[1];
   
+  // Hitung komponen rumus modus
+  let tb = modeLowerBound - 0.5; // tepi bawah kelas modus
+  let freqBefore = modeGroupIndex > 0 ? frekuensi[modeGroupIndex - 1] : 0;
+  let d1 = maxFreq - freqBefore; // frekuensi kelas modus - frekuensi kelas sebelumnya
+  let freqAfter = modeGroupIndex < frekuensi.length - 1 ? frekuensi[modeGroupIndex + 1] : 0;
+  let d2 = maxFreq - freqAfter; // frekuensi kelas modus - frekuensi kelas sesudahnya
+  let k = modeUpperBound - modeLowerBound + 1; // panjang kelas
+  
   html += "<div class='formula'>";
   html += "<span class='formula-title'>Rumus Modus untuk Data Kelompok:</span>";
-  html += "Mo = nilai tengah kelas dengan frekuensi tertinggi";
+  html += "Mo = tb + (d₁ / (d₁ + d₂)) × k";
+  html += "<p style='font-size: 13px; margin: 5px 0;'>Dimana:</p>";
+  html += "<ul style='font-size: 13px; margin: 5px 0 10px 20px;'>";
+  html += "<li>tb = tepi bawah kelas modus</li>";
+  html += "<li>d₁ = frekuensi kelas modus - frekuensi kelas sebelumnya</li>";
+  html += "<li>d₂ = frekuensi kelas modus - frekuensi kelas sesudahnya</li>";
+  html += "<li>k = panjang kelas</li>";
+  html += "</ul>";
+  
   html += "<div class='formula-steps'>";
-  html += `Mo = (${modeLowerBound} + ${modeUpperBound}) / 2`;
-  html += `<br>Mo = ${(modeLowerBound + modeUpperBound) / 2} ≈ ${stats.mode}`;
+  html += `<p>Kelas modus: ${modeLowerBound}-${modeUpperBound} (frekuensi tertinggi = ${maxFreq})</p>`;
+  html += `<p>tb = ${modeLowerBound} - 0.5 = ${tb}</p>`;
+  html += `<p>d₁ = ${maxFreq} - ${freqBefore} = ${d1}</p>`;
+  html += `<p>d₂ = ${maxFreq} - ${freqAfter} = ${d2}</p>`;
+  html += `<p>k = ${modeUpperBound} - ${modeLowerBound} + 1 = ${k}</p>`;
+  html += `<br>Mo = ${tb} + (${d1} / (${d1} + ${d2})) × ${k}`;
+  html += `<br>Mo = ${tb} + (${d1} / ${d1 + d2}) × ${k}`;
+  html += `<br>Mo = ${tb} + ${(d1 / (d1 + d2)).toFixed(4)} × ${k}`;
+  html += `<br>Mo = ${tb} + ${((d1 / (d1 + d2)) * k).toFixed(2)}`;
+  html += `<br>Mo = ${(tb + (d1 / (d1 + d2)) * k).toFixed(2)} ≈ ${stats.mode}`;
   html += "</div></div>";
   
   // Tabel frekuensi untuk modus
@@ -2059,7 +2098,7 @@ function tampilkanLangkahPerhitunganKelompok(dataKelompok, stats) {
   }
   html += "</table>";
   
-  html += `<p><strong>Modus:</strong> ${stats.mode} (dari interval ${modeLowerBound}-${modeUpperBound})</p>`;
+  html += `<p><strong>Modus:</strong> ${stats.mode}</p>`;
   
   html += "</div>";
   
